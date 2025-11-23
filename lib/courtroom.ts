@@ -241,6 +241,18 @@ export function processMatches(data: RawData): MatchResult[] {
 }
 
 export const MOCK_API_DATA: RawData = [
-  { date: "10 Nov 2025", puzzleNo: "238", aditya: 61, mahi: 65 },
-  { date: "11 Nov 2025", puzzleNo: "239", aditya: 32, mahi: 40 },
+  { date: "10 Nov 2025", puzzleNo: "238", aditya: 8, mahi: 15 },
+  { date: "11 Nov 2025", puzzleNo: "239", aditya: 8, mahi: 12 },
+  { date: "12 Nov 2025", puzzleNo: "240", aditya: null, mahi: null },
+  { date: "13 Nov 2025", puzzleNo: "241", aditya: 12, mahi: 11 },
+  { date: "14 Nov 2025", puzzleNo: "242", aditya: null, mahi: null },
+  { date: "15 Nov 2025", puzzleNo: "243", aditya: 11, mahi: 18 },
+  { date: "16 Nov 2025", puzzleNo: "244", aditya: 14, mahi: 18 },
+  { date: "17 Nov 2025", puzzleNo: "245", aditya: 5, mahi: 7 },
+  { date: "18 Nov 2025", puzzleNo: "246", aditya: 11, mahi: 16 },
+  { date: "19 Nov 2025", puzzleNo: "247", aditya: 18, mahi: 21 },
+  { date: "20 Nov 2025", puzzleNo: "248", aditya: 8, mahi: null },
+  { date: "21 Nov 2025", puzzleNo: "249", aditya: 31, mahi: 83 },
+  { date: "22 Nov 2025", puzzleNo: "250", aditya: 54, mahi: 44 },
+  { date: "23 Nov 2025", puzzleNo: "251", aditya: 66, mahi: 46 },
 ];

@@ -23,7 +23,7 @@ const parseTime = (timeStr: string | undefined | null) => {
   return null;
 };
 
-export async function GET() {
+export async function fetchMatches() {
   try {
     const keyFilePath = path.join(process.cwd(), "credentials.json");
 
@@ -42,7 +42,7 @@ export async function GET() {
     const rows = response.data.values;
 
     if (!rows || rows.length === 0) {
-      return NextResponse.json([]);
+      return [];
     }
 
     const matchData = rows.map((row) => ({
@@ -52,11 +52,20 @@ export async function GET() {
       mahi: parseTime(row[3]),
     }));
 
-    return NextResponse.json(matchData);
+    return matchData;
   } catch (error) {
+    console.error("Error fetching matches:", error);
+    return null;
+  }
+}
+
+export async function GET() {
+  const data = await fetchMatches();
+  if (!data) {
     return NextResponse.json(
       { error: "Failed to fetch data" },
       { status: 500 },
     );
   }
+  return NextResponse.json(data);
 }
