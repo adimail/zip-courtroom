@@ -62,10 +62,7 @@ export async function fetchMatches() {
 export async function GET() {
   const data = await fetchMatches();
   if (!data) {
-    return NextResponse.json(
-      { error: "Failed to fetch data" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
   }
   return NextResponse.json(data);
 }
