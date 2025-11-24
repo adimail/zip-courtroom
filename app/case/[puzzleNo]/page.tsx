@@ -38,14 +38,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url: `https://zip-courtroom-dragonwarrior.vercel.app/case/${match.puzzleNo}`,
       siteName: "Zip Courtroom",
-      images: [
-        {
-          url: "/og.png",
-          width: 1200,
-          height: 630,
-          alt: title,
-        },
-      ],
       locale: "en_US",
       type: "website",
     },
@@ -53,7 +45,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title,
       description,
-      images: ["/og.png"],
     },
   };
 }
