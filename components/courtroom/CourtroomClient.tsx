@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { MatchResult } from "@/lib/courtroom";
 import { VerdictBanner } from "@/components/courtroom/VerdictBanner";
 import { MatchList } from "@/components/courtroom/MatchList";
@@ -13,14 +13,57 @@ interface CourtroomClientProps {
 
 export function CourtroomClient({ matches }: CourtroomClientProps) {
   const lastMatchId = matches[matches.length - 1]?.id ?? 0;
-
   const [selectedMatchId, setSelectedMatchId] = useState(lastMatchId);
 
   useEffect(() => {
     setSelectedMatchId(lastMatchId);
   }, [lastMatchId]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setSelectedMatchId((prev) => {
+          const nextId = prev + 1;
+          return nextId < matches.length ? nextId : prev;
+        });
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setSelectedMatchId((prev) => {
+          const prevId = prev - 1;
+          return prevId >= 0 ? prevId : prev;
+        });
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [matches.length]);
+
   const selectedMatch = matches.find((m) => m.id === selectedMatchId) || matches[0];
+
+  const handleShare = useCallback(async () => {
+    if (typeof window === "undefined" || !selectedMatch) return;
+
+    const url = `${window.location.origin}/case/${selectedMatch.puzzleNo}`;
+    const title = `Case #${selectedMatch.puzzleNo}: ${selectedMatch.winner.toUpperCase()} vs ${selectedMatch.loser.toUpperCase()}`;
+    const text = `Official Verdict for Case #${selectedMatch.puzzleNo}.\nWinner: ${selectedMatch.winner.toUpperCase()} (${selectedMatch.winnerTime}s)\n\nRead the full judgment here:`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title,
+          text,
+          url,
+        });
+      } catch (error) {
+        console.log("Error sharing:", error);
+      }
+    } else {
+      navigator.clipboard.writeText(url);
+      alert("Link copied to clipboard!");
+    }
+  }, [selectedMatch]);
 
   return (
     <div className="min-h-screen bg-[#EBE8E1] pb-8 font-sans text-[#1C1C1C]">
@@ -66,7 +109,7 @@ export function CourtroomClient({ matches }: CourtroomClientProps) {
                   </span>
                 </div>
 
-                <VerdictBanner match={selectedMatch} />
+                <VerdictBanner match={selectedMatch} onShare={handleShare} />
 
                 <div className="mt-2 grid grid-cols-2 gap-2 md:mt-4 md:grid-cols-4 md:gap-3">
                   <StatCard
