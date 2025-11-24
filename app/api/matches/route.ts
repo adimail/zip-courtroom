@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import path from "path";
 
 const SPREADSHEET_ID = "1YQ2xoLyN4pXqhuicquJZGWbV6x7wy8vqeCQ5FT05g_0";
-const RANGE = "Sheet1!A2:D";
+const RANGE = "Sheet1!A2:E";
 
 const parseTime = (timeStr: string | undefined | null) => {
   if (!timeStr || timeStr.trim() === "-" || timeStr.trim() === "") {
@@ -50,6 +50,7 @@ export async function fetchMatches() {
       puzzleNo: row[1] || "???",
       aditya: parseTime(row[2]),
       mahi: parseTime(row[3]),
+      prize: row[4] || null,
     }));
 
     return matchData;
