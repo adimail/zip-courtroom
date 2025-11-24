@@ -363,7 +363,7 @@ export function StatsDashboard({ matches, stats, rawData }: StatsDashboardProps)
                     dataKey="Aditya"
                     stroke="#4f46e5"
                     strokeWidth={2}
-                    dot={{ r: 3, fill: "#4f46e5", shape: "square" }}
+                    dot={{ r: 3, fill: "#4f46e5" }}
                     activeDot={{ r: 6 }}
                     connectNulls
                   />
@@ -372,7 +372,7 @@ export function StatsDashboard({ matches, stats, rawData }: StatsDashboardProps)
                     dataKey="Mahi"
                     stroke="#10b981"
                     strokeWidth={2}
-                    dot={{ r: 3, fill: "#10b981", shape: "square" }}
+                    dot={{ r: 3, fill: "#10b981" }}
                     activeDot={{ r: 6 }}
                     connectNulls
                   />

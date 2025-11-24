@@ -43,6 +43,16 @@ export const VERDICT_QUOTES = [
   "Judgment delivered: {W} outran {L} by {diff}s. No objections entertained.",
   "After reviewing the evidence, the court unanimously votes for {W}. {L} is sentenced to extra practice.",
   "{W} wins the zip trial. {L} was found tampering with response time.",
+  "Order in the court! {W} slams the gavel down {diff}s faster than the defense.",
+  "The jury has deliberated for 0 seconds. {W} wins by a landslide.",
+  "Summary judgment granted to {W}. {L}’s defense was inadmissible.",
+  "Habeas Corpus? More like Habeas Speedus. {W} takes the verdict.",
+  "The prosecution rests, and so did {L}. {W} takes the win.",
+  "By the power vested in this algorithm, {W} is declared the victor.",
+  "Justice is blind, but the clock isn't. {W} wins.",
+  "Subpoena served: {L} ordered to witness {W}'s victory lap.",
+  "The docket is clear. {W} reigns supreme today.",
+  "Legal precedent established: {W} is currently the faster party.",
 ];
 
 export const STREAK_QUOTES = [
@@ -50,12 +60,21 @@ export const STREAK_QUOTES = [
   "Zip criminal on the run: {streak} consecutive wins.",
   "Court records show {W} has dominated {streak} hearings in a row.",
   "Streak warning: {W} has been in contempt of losing lately.",
+  "Double jeopardy doesn't apply here; {W} kills it for the {streak}th time.",
+  "A dynasty is forming. {W} extends the winning streak to {streak}.",
+  "The bailiff can't stop them. {W} wins {streak} in a row.",
+  "Serial winner on the loose. Count is now {streak}.",
+  "Objection! {W} is winning too much ({streak}x). Overruled.",
 ];
 
 export const RECORD_QUOTES = [
   "New precedent set — fastest zip ever: {winnerTime}s.",
   "Court archives updated. {W} now holds the all-time speed record.",
   "Historic verdict: {W} has redefined the meaning of ‘fast’.",
+  "Supreme Court ruling: {winnerTime}s is the new gold standard.",
+  "Speed limit violation detected. {W} clocked at a record {winnerTime}s.",
+  "The stenographer couldn't even type that fast. New Record!",
+  "Statute of limitations on 'slow' just expired. New World Record.",
 ];
 
 export const ROAST_QUOTES = [
@@ -65,23 +84,51 @@ export const ROAST_QUOTES = [
   "Court notes that {L} solved slower than a TENET bunksheet approval.",
   "Zip forensic team confirms: {W} simply has better reflexes today.",
   "Verdict includes a side note: {L} should stop blaming the system.",
+  "{L} is currently filing for bankruptcy of speed.",
+  "{L} pleads the fifth on why they were so slow.",
+  "Contempt of court for wasting time. {L} needs to focus.",
+  "Witnesses say {L} was asleep at the wheel.",
+  "Cross-examination reveals {L} was thinking about lunch.",
+  "The defense claims lag. The court claims skill issue.",
+  "{L}'s performance has been stricken from the record for embarrassment.",
+  "Sidebar: {L}, are you even trying?",
+  "Motion to dismiss {L}'s excuse is granted.",
 ];
 
 export const MERCY_QUOTES = [
   "This wasn’t a trial. It was an execution. {W} wins by {diff}s.",
   "Court suspects {L} took a tea break mid-zip.",
   "{L} found wandering off during proceedings — case awarded to {W}.",
+  "Cruel and unusual punishment. {W} wins by a massive margin.",
+  "The statute of limitations ran out while {L} was solving.",
+  "Search and Rescue team dispatched for {L}.",
+  "It was a massacre in the courtroom. {diff}s difference.",
 ];
 
 export const CLOSE_CALL_QUOTES = [
   "Split decision! {W} wins by a razor-thin margin of {diff}s.",
   "One more second and the verdict could’ve flipped.",
   "Case nearly ended in a mistrial — but {W} edges ahead.",
+  "Photo finish evidence required. {W} wins by {diff}s.",
+  "Hung jury avoided by milliseconds.",
+  "A nail-biter in the Supreme Court. {W} survives.",
+  "Too close to call without the replay. {W} by {diff}s.",
 ];
 
 export const DEFAULT_QUOTES = [
   "{L} failed to appear in court (DNF). {W} wins by default.",
   "One party absent. {W} takes the victory lap alone.",
+  "Bail jumping recorded. {L} is nowhere to be found.",
+  "Subpoena ignored by {L}. {W} wins via forfeit.",
+  "Default judgment entered against {L} for non-appearance.",
+];
+
+export const PRIZE_QUOTES = [
+  "The court awards punitive damages in the form of: {prize}.",
+  "Settlement reached. {W} takes the loot: {prize}.",
+  "To the victor go the spoils. Asset transfer: {prize}.",
+  "Court orders immediate transfer of assets: {prize} to {W}.",
+  "Damages awarded to the plaintiff: {prize}.",
 ];
 
 function pickRandom(arr: string[]) {
@@ -94,61 +141,68 @@ export function generateQuotes(
   diff: number,
   streak: number,
   isNewRecord: boolean,
-  winnerTime: number | null
+  winnerTime: number | null,
+  prize: string | null
 ): string[] {
   if (winner === "tie") return ["Mistrial. Both parties failed to submit valid times."];
 
+  const winnerName = winner === "aditya" ? "Aditya" : "Mahi";
+  const loserName = loser === "aditya" ? "Aditya" : "Mahi";
+
   if (diff === -1) {
-    return [
-      pickRandom(DEFAULT_QUOTES)
-        .replaceAll("{W}", winner === "aditya" ? "Aditya" : "Mahi")
-        .replaceAll("{L}", loser === "aditya" ? "Aditya" : "Mahi"),
-    ];
+    return [pickRandom(DEFAULT_QUOTES).replaceAll("{W}", winnerName).replaceAll("{L}", loserName)];
   }
 
   const verdict = pickRandom(VERDICT_QUOTES)
-    .replaceAll("{W}", winner === "aditya" ? "Aditya" : "Mahi")
-    .replaceAll("{L}", loser === "aditya" ? "Aditya" : "Mahi")
+    .replaceAll("{W}", winnerName)
+    .replaceAll("{L}", loserName)
     .replaceAll("{diff}", diff.toFixed(2));
 
   const extras: string[] = [];
 
+  if (prize) {
+    extras.push(
+      pickRandom(PRIZE_QUOTES)
+        .replaceAll("{W}", winnerName)
+        .replaceAll("{L}", loserName)
+        .replaceAll("{prize}", prize)
+    );
+  }
+
   if (streak >= 2) {
     extras.push(
       pickRandom(STREAK_QUOTES)
-        .replace("{W}", winner === "aditya" ? "Aditya" : "Mahi")
-        .replace("{streak}", streak.toString())
-        .replace("{L}", loser === "aditya" ? "Aditya" : "Mahi")
+        .replaceAll("{W}", winnerName)
+        .replaceAll("{streak}", streak.toString())
+        .replaceAll("{L}", loserName)
     );
   }
 
   if (isNewRecord && winnerTime !== null) {
     extras.push(
       pickRandom(RECORD_QUOTES)
-        .replace("{W}", winner === "aditya" ? "Aditya" : "Mahi")
-        .replace("{winnerTime}", winnerTime.toFixed(2))
+        .replaceAll("{W}", winnerName)
+        .replaceAll("{winnerTime}", winnerTime.toFixed(2))
     );
   }
 
   if (diff > 15) {
     extras.push(
       pickRandom(MERCY_QUOTES)
-        .replaceAll("{W}", winner === "aditya" ? "Aditya" : "Mahi")
-        .replaceAll("{L}", loser === "aditya" ? "Aditya" : "Mahi")
+        .replaceAll("{W}", winnerName)
+        .replaceAll("{L}", loserName)
         .replaceAll("{diff}", diff.toFixed(2))
     );
   } else if (diff < 3) {
     extras.push(
       pickRandom(CLOSE_CALL_QUOTES)
-        .replaceAll("{W}", winner === "aditya" ? "Aditya" : "Mahi")
-        .replaceAll("{L}", loser === "aditya" ? "Aditya" : "Mahi")
+        .replaceAll("{W}", winnerName)
+        .replaceAll("{L}", loserName)
         .replaceAll("{diff}", diff.toFixed(2))
     );
   } else {
     extras.push(
-      pickRandom(ROAST_QUOTES)
-        .replaceAll("{W}", winner === "aditya" ? "Aditya" : "Mahi")
-        .replaceAll("{L}", loser === "aditya" ? "Aditya" : "Mahi")
+      pickRandom(ROAST_QUOTES).replaceAll("{W}", winnerName).replaceAll("{L}", loserName)
     );
   }
 
@@ -226,7 +280,15 @@ export function processMatches(data: RawData): MatchResult[] {
       isNewRecord = true;
     }
 
-    const quotes = generateQuotes(winner, loser, diff, currentStreak, isNewRecord, winnerTime);
+    const quotes = generateQuotes(
+      winner,
+      loser,
+      diff,
+      currentStreak,
+      isNewRecord,
+      winnerTime,
+      match.prize
+    );
 
     matches.push({
       id: index,
@@ -313,7 +375,7 @@ export const MOCK_API_DATA: RawData = [
   { date: "18 Nov 2025", puzzleNo: "246", aditya: 11, mahi: 16, prize: null },
   { date: "19 Nov 2025", puzzleNo: "247", aditya: 18, mahi: 21, prize: null },
   { date: "20 Nov 2025", puzzleNo: "248", aditya: 8, mahi: null, prize: null },
-  { date: "21 Nov 2025", puzzleNo: "249", aditya: 31, mahi: 83, prize: null },
+  { date: "21 Nov 2025", puzzleNo: "249", aditya: 31, mahi: 83, prize: "Coffee" },
   { date: "22 Nov 2025", puzzleNo: "250", aditya: 54, mahi: 44, prize: null },
   { date: "23 Nov 2025", puzzleNo: "251", aditya: 66, mahi: 46, prize: null },
 ];
