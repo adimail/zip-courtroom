@@ -10,29 +10,6 @@ interface StandaloneVerdictProps {
 }
 
 export function StandaloneVerdict({ match }: StandaloneVerdictProps) {
-  const handleShare = async () => {
-    if (typeof window === "undefined") return;
-
-    const url = window.location.href;
-    const title = `Case #${match.puzzleNo}: ${match.winner.toUpperCase()} vs ${match.loser.toUpperCase()}`;
-    const text = `Official Verdict for Case #${match.puzzleNo}.\nWinner: ${match.winner.toUpperCase()} (${match.winnerTime}s)\n\nRead the full judgment here:`;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title,
-          text,
-          url,
-        });
-      } catch (error) {
-        console.log("Error sharing:", error);
-      }
-    } else {
-      navigator.clipboard.writeText(url);
-      alert("Link copied to clipboard!");
-    }
-  };
-
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#EBE8E1] p-4">
       <div className="mb-6 w-full max-w-3xl">
@@ -43,7 +20,50 @@ export function StandaloneVerdict({ match }: StandaloneVerdictProps) {
           <ArrowLeft className="h-4 w-4" />
           Back to Court
         </Link>
-        <VerdictBanner match={match} onShare={handleShare} />
+        <VerdictBanner match={match} />
+
+        <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-3">
+          <StatCard label="Winner Time" value={match.winnerTime ? `${match.winnerTime}s` : "N/A"} />
+          <StatCard label="Loser Time" value={match.loserTime ? `${match.loserTime}s` : "DNF"} />
+          <StatCard
+            label="Time Diff"
+            value={match.diff >= 0 ? `+${match.diff.toFixed(2)}s` : "-"}
+          />
+          <StatCard
+            label="Win Streak"
+            value={match.streak.toString()}
+            highlighted={match.streak >= 2}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatCard({
+  label,
+  value,
+  highlighted,
+}: {
+  label: string;
+  value: string;
+  highlighted?: boolean;
+}) {
+  return (
+    <div
+      className={`border p-2 ${
+        highlighted ? "border-amber-600 bg-amber-100" : "border-[#1C1C1C] bg-[#F5F4F0]"
+      }`}
+    >
+      <div className="mb-1 border-b border-slate-300 pb-0.5 text-[9px] font-bold tracking-widest text-slate-500 uppercase">
+        {label}
+      </div>
+      <div
+        className={`font-mono text-lg font-bold md:text-xl ${
+          highlighted ? "text-amber-700" : "text-[#1C1C1C]"
+        }`}
+      >
+        {value}
       </div>
     </div>
   );

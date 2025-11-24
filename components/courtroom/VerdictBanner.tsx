@@ -1,7 +1,7 @@
 "use client";
 
 import { MatchResult } from "../../lib/courtroom";
-import { Gavel, Scale, Gift, Share2 } from "lucide-react";
+import { Gavel, Scale, Gift } from "lucide-react";
 import { motion } from "motion/react";
 
 interface VerdictBannerProps {
@@ -9,7 +9,7 @@ interface VerdictBannerProps {
   onShare?: () => void;
 }
 
-export function VerdictBanner({ match, onShare }: VerdictBannerProps) {
+export function VerdictBanner({ match }: VerdictBannerProps) {
   const primaryQuote = match.quotes[0];
   const subQuotes = match.quotes.slice(1);
 
@@ -20,16 +20,6 @@ export function VerdictBanner({ match, onShare }: VerdictBannerProps) {
       </div>
 
       <div className="relative z-10 flex flex-col border-2 border-double border-[#EBE8E1]/30 p-6 text-[#EBE8E1] md:p-10">
-        {onShare && (
-          <button
-            onClick={onShare}
-            className="absolute top-4 left-4 z-20 flex cursor-pointer items-center gap-1.5 border border-amber-600/50 bg-black/20 px-3 py-1.5 text-[10px] font-bold tracking-wider text-amber-500 uppercase transition-colors hover:bg-amber-600 hover:text-[#1C1C1C]"
-          >
-            <Share2 className="h-3 w-3" />
-            Share Verdict
-          </button>
-        )}
-
         <div className="absolute top-4 right-4 rotate-12 opacity-80 md:top-6 md:right-6">
           <div className="mask-image-grunge flex h-20 w-20 items-center justify-center rounded-full border-2 border-amber-700 p-1 text-amber-700 md:h-24 md:w-24">
             <div className="flex h-full w-full items-center justify-center rounded-full border border-amber-700 text-center text-[10px] leading-none font-black tracking-widest uppercase">
