@@ -92,10 +92,9 @@ export function generateQuotes(
   diff: number,
   streak: number,
   isNewRecord: boolean,
-  winnerTime: number | null,
+  winnerTime: number | null
 ): string[] {
-  if (winner === "tie")
-    return ["Mistrial. Both parties failed to submit valid times."];
+  if (winner === "tie") return ["Mistrial. Both parties failed to submit valid times."];
 
   if (diff === -1) {
     return [
@@ -117,7 +116,7 @@ export function generateQuotes(
       pickRandom(STREAK_QUOTES)
         .replace("{W}", winner === "aditya" ? "Aditya" : "Mahi")
         .replace("{streak}", streak.toString())
-        .replace("{L}", loser === "aditya" ? "Aditya" : "Mahi"),
+        .replace("{L}", loser === "aditya" ? "Aditya" : "Mahi")
     );
   }
 
@@ -125,7 +124,7 @@ export function generateQuotes(
     extras.push(
       pickRandom(RECORD_QUOTES)
         .replace("{W}", winner === "aditya" ? "Aditya" : "Mahi")
-        .replace("{winnerTime}", winnerTime.toFixed(2)),
+        .replace("{winnerTime}", winnerTime.toFixed(2))
     );
   }
 
@@ -134,20 +133,20 @@ export function generateQuotes(
       pickRandom(MERCY_QUOTES)
         .replaceAll("{W}", winner === "aditya" ? "Aditya" : "Mahi")
         .replaceAll("{L}", loser === "aditya" ? "Aditya" : "Mahi")
-        .replaceAll("{diff}", diff.toFixed(2)),
+        .replaceAll("{diff}", diff.toFixed(2))
     );
   } else if (diff < 3) {
     extras.push(
       pickRandom(CLOSE_CALL_QUOTES)
         .replaceAll("{W}", winner === "aditya" ? "Aditya" : "Mahi")
         .replaceAll("{L}", loser === "aditya" ? "Aditya" : "Mahi")
-        .replaceAll("{diff}", diff.toFixed(2)),
+        .replaceAll("{diff}", diff.toFixed(2))
     );
   } else {
     extras.push(
       pickRandom(ROAST_QUOTES)
         .replaceAll("{W}", winner === "aditya" ? "Aditya" : "Mahi")
-        .replaceAll("{L}", loser === "aditya" ? "Aditya" : "Mahi"),
+        .replaceAll("{L}", loser === "aditya" ? "Aditya" : "Mahi")
     );
   }
 
@@ -225,14 +224,7 @@ export function processMatches(data: RawData): MatchResult[] {
       isNewRecord = true;
     }
 
-    const quotes = generateQuotes(
-      winner,
-      loser,
-      diff,
-      currentStreak,
-      isNewRecord,
-      winnerTime,
-    );
+    const quotes = generateQuotes(winner, loser, diff, currentStreak, isNewRecord, winnerTime);
 
     matches.push({
       id: index,

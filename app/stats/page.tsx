@@ -2,7 +2,7 @@ import { fetchMatches } from "@/app/api/matches/route";
 import { MOCK_API_DATA, processMatches, calculateStats } from "@/lib/courtroom";
 import { StatsDashboard } from "@/components/stats/StatsDashboard";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function StatsPage() {
   let rawData = await fetchMatches();
