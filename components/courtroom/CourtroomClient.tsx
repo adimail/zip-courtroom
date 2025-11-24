@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { MatchResult } from "@/lib/courtroom";
 import { VerdictBanner } from "@/components/courtroom/VerdictBanner";
 import { MatchList } from "@/components/courtroom/MatchList";
-import { Gavel } from "lucide-react";
+import { Gavel, BarChart3 } from "lucide-react";
+import Link from "next/link";
 
 interface CourtroomClientProps {
   matches: MatchResult[];
@@ -24,7 +25,8 @@ export function CourtroomClient({ matches }: CourtroomClientProps) {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-10">
-      <header className="bg-slate-900 text-amber-50 border-b-4 border-amber-600 py-4 md:py-6 sticky top-0 z-20 shadow-md">
+      {/* Main Header - Sticky Top (z-30 to stay above everything) */}
+      <header className="bg-slate-900 text-amber-50 border-b-4 border-amber-600 py-4 md:py-6 sticky top-0 z-30 shadow-md">
         <div className="container mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="bg-amber-600 p-1.5 md:p-2 rounded-lg">
@@ -32,15 +34,27 @@ export function CourtroomClient({ matches }: CourtroomClientProps) {
             </div>
             <div>
               <h1 className="text-xl md:text-3xl font-serif font-bold tracking-tight">ZIP COURTROOM</h1>
+              <p className="text-amber-500/80 text-[10px] md:text-xs uppercase tracking-widest hidden md:block">Random Quote Generator System</p>
             </div>
           </div>
+          
+          <Link 
+            href="/stats" 
+            className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-amber-50 px-3 py-2 md:px-4 md:py-2 rounded-md border border-slate-700 transition-colors text-xs md:text-sm font-medium"
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span className="hidden md:inline">View Statistics</span>
+            <span className="md:hidden">Stats</span>
+          </Link>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-4 md:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
+          
           {/* Left Column: Verdict Display */}
-          <div className="lg:col-span-8 order-1 lg:order-1">
+          {/* lg:sticky makes it stick on desktop. top-28 accounts for the main header height. */}
+          <div className="lg:col-span-8 order-1 lg:order-1 lg:sticky lg:top-28 h-fit">
             {selectedMatch ? (
               <div className="space-y-4 md:space-y-6">
                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-1">
@@ -66,7 +80,7 @@ export function CourtroomClient({ matches }: CourtroomClientProps) {
             )}
           </div>
 
-          {/* Right Column: List (Scrollable) */}
+          {/* Right Column: List */}
           <div className="lg:col-span-4 order-2 lg:order-2">
             <MatchList
               matches={matches}

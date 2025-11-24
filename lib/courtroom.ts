@@ -23,6 +23,18 @@ export interface MatchResult {
   quotes: string[];
 }
 
+export interface CourtStats {
+  totalGames: number;
+  adityaWins: number;
+  mahiWins: number;
+  ties: number;
+  fastestTime: number;
+  fastestPlayer: string;
+  avgDiff: number;
+  adityaAvgTime: number;
+  mahiAvgTime: number;
+}
+
 export const VERDICT_QUOTES = [
   "Case closed. {W} is declared Not Guilty of Being Slow. {L} charged with First Degree Delay.",
   "Court finds in favor of {W}. {L}’s appeal denied due to insufficient speed.",
@@ -238,6 +250,60 @@ export function processMatches(data: RawData): MatchResult[] {
   });
 
   return matches;
+}
+
+export function calculateStats(matches: MatchResult[], rawData: RawData): CourtStats {
+  let adityaWins = 0;
+  let mahiWins = 0;
+  let ties = 0;
+  let fastestTime = Infinity;
+  let fastestPlayer = "-";
+  let totalDiff = 0;
+  let diffCount = 0;
+
+  let adityaTotalTime = 0;
+  let adityaCount = 0;
+  let mahiTotalTime = 0;
+  let mahiCount = 0;
+
+  matches.forEach((m) => {
+    if (m.winner === "aditya") adityaWins++;
+    else if (m.winner === "mahi") mahiWins++;
+    else ties++;
+
+    if (m.winnerTime !== null && m.winnerTime < fastestTime) {
+      fastestTime = m.winnerTime;
+      fastestPlayer = m.winner;
+    }
+
+    if (m.diff >= 0) {
+      totalDiff += m.diff;
+      diffCount++;
+    }
+  });
+
+  rawData.forEach((r) => {
+    if (r.aditya) {
+      adityaTotalTime += r.aditya;
+      adityaCount++;
+    }
+    if (r.mahi) {
+      mahiTotalTime += r.mahi;
+      mahiCount++;
+    }
+  });
+
+  return {
+    totalGames: matches.length,
+    adityaWins,
+    mahiWins,
+    ties,
+    fastestTime: fastestTime === Infinity ? 0 : fastestTime,
+    fastestPlayer,
+    avgDiff: diffCount > 0 ? parseFloat((totalDiff / diffCount).toFixed(2)) : 0,
+    adityaAvgTime: adityaCount > 0 ? parseFloat((adityaTotalTime / adityaCount).toFixed(2)) : 0,
+    mahiAvgTime: mahiCount > 0 ? parseFloat((mahiTotalTime / mahiCount).toFixed(2)) : 0,
+  };
 }
 
 export const MOCK_API_DATA: RawData = [
