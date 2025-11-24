@@ -45,7 +45,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
       const isAditya = data.winner === "aditya";
       return (
         <div className="border-2 border-[#1C1C1C] bg-[#1C1C1C] p-3 text-xs text-[#EBE8E1] shadow-none">
-          <p className="mb-1 font-serif font-bold uppercase tracking-wider">Puzzle #{label}</p>
+          <p className="mb-1 font-serif font-bold tracking-wider uppercase">Puzzle #{label}</p>
           <p className={isAditya ? "text-indigo-400" : "text-emerald-400"}>
             Winner: {isAditya ? "Aditya" : "Mahi"}
           </p>
@@ -56,7 +56,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
 
     return (
       <div className="border-2 border-[#1C1C1C] bg-[#1C1C1C] p-3 text-xs text-[#EBE8E1] shadow-none">
-        <p className="mb-1 font-serif font-bold uppercase tracking-wider">Puzzle #{label}</p>
+        <p className="mb-1 font-serif font-bold tracking-wider uppercase">Puzzle #{label}</p>
         {payload.map((p, idx) => (
           <p key={idx} style={{ color: p.color }}>
             {p.name}: {p.value}s
@@ -110,7 +110,10 @@ export function StatsDashboard({ matches, stats, rawData }: StatsDashboardProps)
       {/* Header */}
       <header className="sticky top-0 z-30 border-b-4 border-[#1C1C1C] bg-[#1C1C1C] py-4 text-[#EBE8E1] shadow-none md:py-6">
         <div className="container mx-auto flex items-center gap-4 px-4">
-          <Link href="/" className="border border-gray-600 p-2 transition-colors hover:bg-gray-800 hover:text-white">
+          <Link
+            href="/"
+            className="border border-gray-600 p-2 transition-colors hover:bg-gray-800 hover:text-white"
+          >
             <ArrowLeft className="h-5 w-5 md:h-6 md:w-6" />
           </Link>
           <div>
@@ -181,7 +184,12 @@ export function StatsDashboard({ matches, stats, rawData }: StatsDashboardProps)
                     stroke="none"
                   >
                     {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} stroke="#1C1C1C" strokeWidth={2} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.color}
+                        stroke="#1C1C1C"
+                        strokeWidth={2}
+                      />
                     ))}
                   </Pie>
                   <Tooltip
@@ -205,7 +213,7 @@ export function StatsDashboard({ matches, stats, rawData }: StatsDashboardProps)
                 <Activity className="h-5 w-5 text-amber-600" />
                 TIME DIFFERENCE HISTORY
               </h2>
-              <p className="text-xs text-gray-500 uppercase tracking-wide">
+              <p className="text-xs tracking-wide text-gray-500 uppercase">
                 <span className="font-bold text-indigo-600">● Aditya</span> vs{" "}
                 <span className="font-bold text-emerald-600">● Mahi</span> (Higher = Larger Margin)
               </p>
@@ -214,7 +222,12 @@ export function StatsDashboard({ matches, stats, rawData }: StatsDashboardProps)
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={diffData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="0" vertical={false} stroke="#d1d5db" />
-                  <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#1C1C1C" }} axisLine={{ stroke: "#1C1C1C" }} tickLine={{ stroke: "#1C1C1C" }} />
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fontSize: 10, fill: "#1C1C1C" }}
+                    axisLine={{ stroke: "#1C1C1C" }}
+                    tickLine={{ stroke: "#1C1C1C" }}
+                  />
                   <YAxis
                     axisLine={{ stroke: "#1C1C1C" }}
                     tickLine={{ stroke: "#1C1C1C" }}
@@ -284,26 +297,26 @@ export function StatsDashboard({ matches, stats, rawData }: StatsDashboardProps)
                     backgroundColor: "#4f46e5",
                     color: "white",
                     fontWeight: "bold",
-                    border: "1px solid #1C1C1C"
+                    border: "1px solid #1C1C1C",
                   },
                   mahi: {
                     backgroundColor: "#10b981",
                     color: "white",
                     fontWeight: "bold",
-                    border: "1px solid #1C1C1C"
+                    border: "1px solid #1C1C1C",
                   },
                 }}
                 showOutsideDays
                 fixedWeeks
               />
 
-              <div className="mt-4 flex gap-4 text-xs font-medium uppercase tracking-wider">
+              <div className="mt-4 flex gap-4 text-xs font-medium tracking-wider uppercase">
                 <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 bg-indigo-600 border border-[#1C1C1C]"></div>
+                  <div className="h-3 w-3 border border-[#1C1C1C] bg-indigo-600"></div>
                   <span>Aditya</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 bg-emerald-500 border border-[#1C1C1C]"></div>
+                  <div className="h-3 w-3 border border-[#1C1C1C] bg-emerald-500"></div>
                   <span>Mahi</span>
                 </div>
               </div>
@@ -317,7 +330,7 @@ export function StatsDashboard({ matches, stats, rawData }: StatsDashboardProps)
                 <TrendingUp className="h-5 w-5 text-amber-600" />
                 RESPONSE TIME HISTORY
               </h2>
-              <p className="mt-1 text-xs text-gray-500 uppercase tracking-wide">
+              <p className="mt-1 text-xs tracking-wide text-gray-500 uppercase">
                 Raw solve times (Lower is better)
               </p>
             </div>
@@ -326,7 +339,12 @@ export function StatsDashboard({ matches, stats, rawData }: StatsDashboardProps)
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={trendData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="0" vertical={false} stroke="#d1d5db" />
-                  <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#1C1C1C" }} axisLine={{ stroke: "#1C1C1C" }} tickLine={{ stroke: "#1C1C1C" }} />
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fontSize: 10, fill: "#1C1C1C" }}
+                    axisLine={{ stroke: "#1C1C1C" }}
+                    tickLine={{ stroke: "#1C1C1C" }}
+                  />
                   <YAxis
                     axisLine={{ stroke: "#1C1C1C" }}
                     tickLine={{ stroke: "#1C1C1C" }}
@@ -367,14 +385,18 @@ export function StatsDashboard({ matches, stats, rawData }: StatsDashboardProps)
         {/* Additional Stats Grid */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="border-2 border-[#1C1C1C] bg-[#F5F4F0] p-6">
-            <h3 className="mb-4 font-serif text-lg font-bold text-[#1C1C1C] uppercase border-b-2 border-indigo-600 w-fit">Aditya&apos;s Profile</h3>
+            <h3 className="mb-4 w-fit border-b-2 border-indigo-600 font-serif text-lg font-bold text-[#1C1C1C] uppercase">
+              Aditya&apos;s Profile
+            </h3>
             <div className="space-y-3">
               <div className="flex justify-between border-b border-gray-300 pb-2 text-sm">
-                <span className="text-gray-600 uppercase tracking-wider text-xs">Average Time</span>
+                <span className="text-xs tracking-wider text-gray-600 uppercase">Average Time</span>
                 <span className="font-mono font-bold text-[#1C1C1C]">{stats.adityaAvgTime}s</span>
               </div>
               <div className="flex justify-between border-b border-gray-300 pb-2 text-sm">
-                <span className="text-gray-600 uppercase tracking-wider text-xs">Fastest Record</span>
+                <span className="text-xs tracking-wider text-gray-600 uppercase">
+                  Fastest Record
+                </span>
                 <span className="font-mono font-bold text-[#1C1C1C]">
                   {stats.fastestPlayer === "aditya" ? stats.fastestTime : "-"}s
                 </span>
@@ -383,14 +405,18 @@ export function StatsDashboard({ matches, stats, rawData }: StatsDashboardProps)
           </div>
 
           <div className="border-2 border-[#1C1C1C] bg-[#F5F4F0] p-6">
-            <h3 className="mb-4 font-serif text-lg font-bold text-[#1C1C1C] uppercase border-b-2 border-emerald-600 w-fit">Mahi&apos;s Profile</h3>
+            <h3 className="mb-4 w-fit border-b-2 border-emerald-600 font-serif text-lg font-bold text-[#1C1C1C] uppercase">
+              Mahi&apos;s Profile
+            </h3>
             <div className="space-y-3">
               <div className="flex justify-between border-b border-gray-300 pb-2 text-sm">
-                <span className="text-gray-600 uppercase tracking-wider text-xs">Average Time</span>
+                <span className="text-xs tracking-wider text-gray-600 uppercase">Average Time</span>
                 <span className="font-mono font-bold text-[#1C1C1C]">{stats.mahiAvgTime}s</span>
               </div>
               <div className="flex justify-between border-b border-gray-300 pb-2 text-sm">
-                <span className="text-gray-600 uppercase tracking-wider text-xs">Fastest Record</span>
+                <span className="text-xs tracking-wider text-gray-600 uppercase">
+                  Fastest Record
+                </span>
                 <span className="font-mono font-bold text-[#1C1C1C]">
                   {stats.fastestPlayer === "mahi" ? stats.fastestTime : "-"}s
                 </span>
@@ -426,7 +452,9 @@ function KpiCard({
   return (
     <div className="flex h-full flex-col justify-between border-2 border-[#1C1C1C] bg-[#F5F4F0] p-4">
       <div className="mb-2 flex items-center justify-between border-b border-gray-300 pb-2">
-        <span className="text-[10px] font-bold tracking-widest text-gray-500 uppercase">{title}</span>
+        <span className="text-[10px] font-bold tracking-widest text-gray-500 uppercase">
+          {title}
+        </span>
         {icon}
       </div>
       <div className="flex items-baseline gap-2">
