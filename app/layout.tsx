@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://zip-courtroom-dragonwarrior.vercel.app"),
   title: "Zip Courtroom | Director vs. Documentation Head",
   description:
     "The high-stakes, over-engineered rivalry between the Director and the Documentation Head. Solving the game of zip from linkedin has never been this litigious.",
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
     title: "Zip Courtroom | Director vs. Documentation Head",
     description:
       "Witness the petty legal battle between the Director and the Documentation Head. Who solves 'zip' faster? The court is now in session.",
-    url: "https://zip-courtroom.vercel.app",
+    url: "https://zip-courtroom-dragonwarrior.vercel.app",
     siteName: "Zip Courtroom",
     images: [
       {

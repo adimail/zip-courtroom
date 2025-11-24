@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      url: `https://zip-courtroom.vercel.app/case/${match.puzzleNo}`,
+      url: `https://zip-courtroom-dragonwarrior.vercel.app/case/${match.puzzleNo}`,
       siteName: "Zip Courtroom",
       images: [
         {
