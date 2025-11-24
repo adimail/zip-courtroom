@@ -20,8 +20,7 @@ export function CourtroomClient({ matches }: CourtroomClientProps) {
     setSelectedMatchId(lastMatchId);
   }, [lastMatchId]);
 
-  const selectedMatch =
-    matches.find((m) => m.id === selectedMatchId) || matches[0];
+  const selectedMatch = matches.find((m) => m.id === selectedMatchId) || matches[0];
 
   return (
     <div className="min-h-screen bg-[#EBE8E1] pb-8 font-sans text-[#1C1C1C]">
@@ -59,8 +58,7 @@ export function CourtroomClient({ matches }: CourtroomClientProps) {
               <div className="space-y-4">
                 <div className="flex flex-col justify-between border-b border-[#1C1C1C] pb-1 md:flex-row md:items-end">
                   <h2 className="font-serif text-sm font-bold text-[#1C1C1C] md:text-base">
-                    CASE #{selectedMatch.puzzleNo}:{" "}
-                    {selectedMatch.winner.toUpperCase()} v.{" "}
+                    CASE #{selectedMatch.puzzleNo}: {selectedMatch.winner.toUpperCase()} v.{" "}
                     {selectedMatch.loser.toUpperCase()}
                   </h2>
                   <span className="font-mono text-[10px] font-bold text-slate-600 uppercase md:text-xs">
@@ -73,27 +71,15 @@ export function CourtroomClient({ matches }: CourtroomClientProps) {
                 <div className="mt-2 grid grid-cols-2 gap-2 md:mt-4 md:grid-cols-4 md:gap-3">
                   <StatCard
                     label="Winner Time"
-                    value={
-                      selectedMatch.winnerTime
-                        ? `${selectedMatch.winnerTime}s`
-                        : "N/A"
-                    }
+                    value={selectedMatch.winnerTime ? `${selectedMatch.winnerTime}s` : "N/A"}
                   />
                   <StatCard
                     label="Loser Time"
-                    value={
-                      selectedMatch.loserTime
-                        ? `${selectedMatch.loserTime}s`
-                        : "DNF"
-                    }
+                    value={selectedMatch.loserTime ? `${selectedMatch.loserTime}s` : "DNF"}
                   />
                   <StatCard
                     label="Time Diff"
-                    value={
-                      selectedMatch.diff >= 0
-                        ? `+${selectedMatch.diff.toFixed(2)}s`
-                        : "-"
-                    }
+                    value={selectedMatch.diff >= 0 ? `+${selectedMatch.diff.toFixed(2)}s` : "-"}
                   />
                   <StatCard
                     label="Win Streak"
@@ -104,9 +90,7 @@ export function CourtroomClient({ matches }: CourtroomClientProps) {
               </div>
             ) : (
               <div className="flex h-48 items-center justify-center border border-dashed border-[#1C1C1C] bg-transparent">
-                <p className="font-serif text-sm text-[#1C1C1C]">
-                  No cases filed yet.
-                </p>
+                <p className="font-serif text-sm text-[#1C1C1C]">No cases filed yet.</p>
               </div>
             )}
           </div>
@@ -141,9 +125,7 @@ function StatCard({
   return (
     <div
       className={`border p-2 ${
-        highlighted
-          ? "border-amber-600 bg-amber-100"
-          : "border-[#1C1C1C] bg-[#F5F4F0]"
+        highlighted ? "border-amber-600 bg-amber-100" : "border-[#1C1C1C] bg-[#F5F4F0]"
       }`}
     >
       <div className="mb-1 border-b border-slate-300 pb-0.5 text-[9px] font-bold tracking-widest text-slate-500 uppercase">
