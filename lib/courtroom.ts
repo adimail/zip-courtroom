@@ -298,7 +298,7 @@ export function processMatches(data: RawData): MatchResult[] {
         loserTime = tMahi;
       }
 
-      if (winner !== "tie" && winner !== "draw" && winnerTime !== null && loserTime !== null) {
+      if (winner !== "tie" && winnerTime !== null && loserTime !== null) {
         diff = Math.abs(loserTime - winnerTime);
       }
     }
