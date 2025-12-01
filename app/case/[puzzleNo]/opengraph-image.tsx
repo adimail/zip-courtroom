@@ -246,7 +246,7 @@ export default async function Image({ params }: Props) {
                 textTransform: "uppercase",
               }}
             >
-              Judge: ZIP AI
+              Judge: Master Oogway
             </div>
             <div
               style={{

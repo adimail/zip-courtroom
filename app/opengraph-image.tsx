@@ -241,7 +241,7 @@ export default async function Image() {
                 textTransform: "uppercase",
               }}
             >
-              Judge: ZIP AI
+              Judge: Master Oogway
             </div>
             <div
               style={{

@@ -93,7 +93,7 @@ export function VerdictBanner({ match }: VerdictBannerProps) {
         <div className="mt-8 flex items-end justify-between border-t border-gray-800 pt-3">
           <div className="flex flex-col">
             <span className="text-[10px] tracking-widest text-gray-500 uppercase">
-              Judge: ZIP AI
+              Judge: Master Oogway
             </span>
           </div>
           <div className="flex flex-col items-end">
