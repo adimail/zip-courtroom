@@ -1,7 +1,8 @@
-export type Player = "aditya" | "mahi" | "tie";
+import { format, parse, addDays } from "date-fns";
+
+export type Player = "aditya" | "mahi" | "tie" | "draw";
 
 export interface RawMatch {
-  date: string;
   puzzleNo: string;
   aditya: number | null;
   mahi: number | null;
@@ -30,6 +31,7 @@ export interface CourtStats {
   adityaWins: number;
   mahiWins: number;
   ties: number;
+  draws: number;
   fastestTime: number;
   fastestPlayer: string;
   avgDiff: number;
@@ -131,6 +133,34 @@ export const PRIZE_QUOTES = [
   "Damages awarded to the plaintiff: {prize}.",
 ];
 
+export const TIE_QUOTES = [
+  "A perfect deadlock. The court rules this case a tie. Neither party gains the upper hand.",
+  "Unprecedented speed synchronization. Case dismissed due to equal performance.",
+  "The clock stops precisely at the same moment. It's a tie.",
+  "Judgment reserved. The times were identical. We call this a 'Zip Tie'.",
+];
+
+export const DRAW_QUOTES = [
+  "Mistrial declared. Both parties failed to appear in court.",
+  "Case dismissed. No valid submissions were entered into the record.",
+  "The courtroom is empty. Both contestants were absent, resulting in a draw.",
+  "A double forfeit. The case is declared a draw due to non-appearance.",
+];
+
+const REFERENCE_DATE = parse("10 Nov 2025", "d MMM yyyy", new Date(2025, 10, 10));
+const REFERENCE_PUZZLE = 238;
+
+function calculateDate(puzzleNo: string): string {
+  const currentPuzzle = parseInt(puzzleNo, 10);
+  if (isNaN(currentPuzzle)) return "Unknown Date";
+
+  const dayDifference = currentPuzzle - REFERENCE_PUZZLE;
+
+  const targetDate = addDays(REFERENCE_DATE, dayDifference);
+
+  return format(targetDate, "d MMM yyyy");
+}
+
 function pickRandom(arr: string[]) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
@@ -144,7 +174,16 @@ export function generateQuotes(
   winnerTime: number | null,
   prize: string | null
 ): string[] {
-  if (winner === "tie") return ["Mistrial. Both parties failed to submit valid times."];
+  if (winner === "draw") {
+    return [pickRandom(DRAW_QUOTES), "The court awaits their next appearance."];
+  }
+
+  if (winner === "tie") {
+    return [
+      pickRandom(TIE_QUOTES) + ` Final time: ${winnerTime!.toFixed(2)}s.`,
+      "The court's decision is final: stalemate.",
+    ];
+  }
 
   const winnerName = winner === "aditya" ? "Aditya" : "Mahi";
   const loserName = loser === "aditya" ? "Aditya" : "Mahi";
@@ -220,25 +259,26 @@ export function processMatches(data: RawData): MatchResult[] {
     const tAditya = match.aditya;
     const tMahi = match.mahi;
 
-    let winner: Player = "tie";
-    let loser: Player = "tie";
+    const date = calculateDate(match.puzzleNo);
+
+    let winner: Player = "draw";
+    let loser: Player = "draw";
     let winnerTime: number | null = null;
     let loserTime: number | null = null;
     let diff = 0;
 
     if (tAditya === null && tMahi === null) {
-      winner = "tie";
+      winner = "draw";
+      loser = "draw";
     } else if (tAditya === null) {
       winner = "mahi";
       loser = "aditya";
       winnerTime = tMahi;
-      loserTime = null;
       diff = -1;
     } else if (tMahi === null) {
       winner = "aditya";
       loser = "mahi";
       winnerTime = tAditya;
-      loserTime = null;
       diff = -1;
     } else {
       if (tAditya < tMahi) {
@@ -253,16 +293,17 @@ export function processMatches(data: RawData): MatchResult[] {
         loserTime = tAditya;
       } else {
         winner = "tie";
+        loser = "tie";
         winnerTime = tAditya;
         loserTime = tMahi;
       }
 
-      if (winner !== "tie" && winnerTime !== null && loserTime !== null) {
+      if (winner !== "tie" && winner !== "draw" && winnerTime !== null && loserTime !== null) {
         diff = Math.abs(loserTime - winnerTime);
       }
     }
 
-    if (winner !== "tie") {
+    if (winner !== "tie" && winner !== "draw") {
       if (winner === currentStreakWinner) {
         currentStreak++;
       } else {
@@ -292,7 +333,7 @@ export function processMatches(data: RawData): MatchResult[] {
 
     matches.push({
       id: index,
-      date: match.date,
+      date,
       puzzleNo: match.puzzleNo,
       winner,
       loser,
@@ -313,6 +354,7 @@ export function calculateStats(matches: MatchResult[], rawData: RawData): CourtS
   let adityaWins = 0;
   let mahiWins = 0;
   let ties = 0;
+  let draws = 0;
   let fastestTime = Infinity;
   let fastestPlayer = "-";
   let totalDiff = 0;
@@ -326,7 +368,8 @@ export function calculateStats(matches: MatchResult[], rawData: RawData): CourtS
   matches.forEach((m) => {
     if (m.winner === "aditya") adityaWins++;
     else if (m.winner === "mahi") mahiWins++;
-    else ties++;
+    else if (m.winner === "tie") ties++;
+    else if (m.winner === "draw") draws++;
 
     if (m.winnerTime !== null && m.winnerTime < fastestTime) {
       fastestTime = m.winnerTime;
@@ -355,6 +398,7 @@ export function calculateStats(matches: MatchResult[], rawData: RawData): CourtS
     adityaWins,
     mahiWins,
     ties,
+    draws,
     fastestTime: fastestTime === Infinity ? 0 : fastestTime,
     fastestPlayer,
     avgDiff: diffCount > 0 ? parseFloat((totalDiff / diffCount).toFixed(2)) : 0,
@@ -364,18 +408,26 @@ export function calculateStats(matches: MatchResult[], rawData: RawData): CourtS
 }
 
 export const MOCK_API_DATA: RawData = [
-  { date: "10 Nov 2025", puzzleNo: "238", aditya: 8, mahi: 15, prize: null },
-  { date: "11 Nov 2025", puzzleNo: "239", aditya: 8, mahi: 12, prize: null },
-  { date: "12 Nov 2025", puzzleNo: "240", aditya: null, mahi: null, prize: null },
-  { date: "13 Nov 2025", puzzleNo: "241", aditya: 12, mahi: 11, prize: null },
-  { date: "14 Nov 2025", puzzleNo: "242", aditya: null, mahi: null, prize: null },
-  { date: "15 Nov 2025", puzzleNo: "243", aditya: 11, mahi: 18, prize: null },
-  { date: "16 Nov 2025", puzzleNo: "244", aditya: 14, mahi: 18, prize: null },
-  { date: "17 Nov 2025", puzzleNo: "245", aditya: 5, mahi: 7, prize: null },
-  { date: "18 Nov 2025", puzzleNo: "246", aditya: 11, mahi: 16, prize: null },
-  { date: "19 Nov 2025", puzzleNo: "247", aditya: 18, mahi: 21, prize: null },
-  { date: "20 Nov 2025", puzzleNo: "248", aditya: 8, mahi: null, prize: null },
-  { date: "21 Nov 2025", puzzleNo: "249", aditya: 31, mahi: 83, prize: "Coffee" },
-  { date: "22 Nov 2025", puzzleNo: "250", aditya: 54, mahi: 44, prize: null },
-  { date: "23 Nov 2025", puzzleNo: "251", aditya: 66, mahi: 46, prize: null },
+  { puzzleNo: "238", aditya: 8, mahi: 15, prize: null },
+  { puzzleNo: "239", aditya: 8, mahi: 12, prize: null },
+  { puzzleNo: "240", aditya: null, mahi: null, prize: null },
+  { puzzleNo: "241", aditya: 12, mahi: 11, prize: "Diary" },
+  { puzzleNo: "242", aditya: null, mahi: null, prize: null },
+  { puzzleNo: "243", aditya: 11, mahi: 18, prize: null },
+  { puzzleNo: "244", aditya: 14, mahi: 18, prize: null },
+  { puzzleNo: "245", aditya: 5, mahi: 7, prize: null },
+  { puzzleNo: "246", aditya: 11, mahi: 16, prize: null },
+  { puzzleNo: "247", aditya: 18, mahi: 21, prize: "Shawarma" },
+  { puzzleNo: "248", aditya: 8, mahi: null, prize: null },
+  { puzzleNo: "249", aditya: 31, mahi: 83, prize: null },
+  { puzzleNo: "250", aditya: 54, mahi: 44, prize: null },
+  { puzzleNo: "251", aditya: 66, mahi: 46, prize: null },
+  { puzzleNo: "252", aditya: 8, mahi: 7, prize: null },
+  { puzzleNo: "253", aditya: 21, mahi: 27, prize: null },
+  { puzzleNo: "254", aditya: 11, mahi: 18, prize: null },
+  { puzzleNo: "255", aditya: 12, mahi: 29, prize: null },
+  { puzzleNo: "256", aditya: 13, mahi: 74, prize: null },
+  { puzzleNo: "257", aditya: 25, mahi: 74, prize: null },
+  { puzzleNo: "258", aditya: 17, mahi: 105, prize: null },
+  { puzzleNo: "259", aditya: 9, mahi: 9, prize: null },
 ];

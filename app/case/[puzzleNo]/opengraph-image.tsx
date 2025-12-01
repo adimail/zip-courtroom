@@ -48,7 +48,6 @@ export default async function Image({ params }: Props) {
     );
   }
 
-  const winnerName = match.winner === "aditya" ? "Aditya" : "Mahi";
   const primaryQuote = match.quotes[0];
   const secondaryQuote = match.quotes[1] || "Justice served.";
 
@@ -57,6 +56,21 @@ export default async function Image({ params }: Props) {
   );
 
   const sansFontData = fs.readFileSync(path.join(process.cwd(), "public/fonts/Inter-Regular.ttf"));
+
+  const getVerdictChar = () => {
+    switch (match.winner) {
+      case "aditya":
+        return "A";
+      case "mahi":
+        return "M";
+      case "tie":
+        return "T";
+      case "draw":
+        return "D";
+      default:
+        return "?";
+    }
+  };
 
   return new ImageResponse(
     (
@@ -286,7 +300,7 @@ export default async function Image({ params }: Props) {
               <div style={{ display: "flex" }}>Official</div>
               <div style={{ display: "flex" }}>Verdict</div>
               <div style={{ display: "flex", fontSize: "24px", marginTop: "5px" }}>
-                {winnerName === "Aditya" ? "A" : "M"}
+                {getVerdictChar()}
               </div>
             </div>
           </div>

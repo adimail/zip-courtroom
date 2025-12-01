@@ -27,8 +27,39 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const title = `Verdict: Case #${match.puzzleNo} | ${match.winner.toUpperCase()} Wins`;
-  const description = `Official Judicial Record. Winner: ${match.winner} (${match.winnerTime}s). Loser: ${match.loser}. See the full verdict.`;
+  let winnerDisplay: string;
+  switch (match.winner) {
+    case "aditya":
+    case "mahi":
+      winnerDisplay = `${match.winner.toUpperCase()} Wins`;
+      break;
+    case "tie":
+      winnerDisplay = "TIE";
+      break;
+    case "draw":
+      winnerDisplay = "DRAW";
+      break;
+    default:
+      winnerDisplay = "VERDICT";
+  }
+
+  const title = `Verdict: Case #${match.puzzleNo} | ${winnerDisplay}`;
+
+  let description: string;
+  switch (match.winner) {
+    case "aditya":
+    case "mahi":
+      description = `Official Judicial Record. Winner: ${match.winner} (${match.winnerTime}s). Loser: ${match.loser}. See the full verdict.`;
+      break;
+    case "tie":
+      description = `Official Judicial Record: Case resulted in a Tie at ${match.winnerTime}s.`;
+      break;
+    case "draw":
+      description = `Official Judicial Record: Case resulted in a Draw as both parties were absent.`;
+      break;
+    default:
+      description = "Official Judicial Record for Zip Courtroom.";
+  }
 
   return {
     title,

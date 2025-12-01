@@ -65,6 +65,22 @@ export function CourtroomClient({ matches }: CourtroomClientProps) {
     }
   }, [selectedMatch]);
 
+  const getMatchTitle = (match: MatchResult) => {
+    if (!match) return "";
+    switch (match.winner) {
+      case "aditya":
+      case "mahi":
+        return `CASE #${match.puzzleNo}: ${match.winner.toUpperCase()} v. ${match.loser.toUpperCase()}`;
+      case "tie":
+        return `CASE #${match.puzzleNo}: TIE`;
+      case "draw":
+        return `CASE #${match.puzzleNo}: DRAW`;
+      default:
+        return `CASE #${match.puzzleNo}`;
+    }
+  };
+  const matchTitle = getMatchTitle(selectedMatch);
+
   return (
     <div className="min-h-screen bg-[#EBE8E1] pb-8 font-sans text-[#1C1C1C]">
       <header className="sticky top-0 z-30 border-b-2 border-[#1C1C1C] bg-[#1C1C1C] py-2 text-[#EBE8E1] shadow-sm md:py-3">
@@ -101,8 +117,7 @@ export function CourtroomClient({ matches }: CourtroomClientProps) {
               <div className="space-y-4">
                 <div className="flex flex-col justify-between border-b border-[#1C1C1C] pb-1 md:flex-row md:items-end">
                   <h2 className="font-serif text-sm font-bold text-[#1C1C1C] md:text-base">
-                    CASE #{selectedMatch.puzzleNo}: {selectedMatch.winner.toUpperCase()} v.{" "}
-                    {selectedMatch.loser.toUpperCase()}
+                    {matchTitle}
                   </h2>
                   <span className="font-mono text-[10px] font-bold text-slate-600 uppercase md:text-xs">
                     {selectedMatch.date}

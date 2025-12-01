@@ -4,7 +4,6 @@ import { fetchMatches } from "@/app/api/matches/route";
 import fs from "fs";
 import path from "path";
 
-// Route segment config
 export const runtime = "nodejs";
 export const alt = "Zip Courtroom Official Verdict";
 export const size = {
@@ -14,17 +13,14 @@ export const size = {
 export const contentType = "image/png";
 
 export default async function Image() {
-  // 1. Fetch Data
   let rawData = await fetchMatches();
   if (!rawData || rawData.length === 0) {
     rawData = MOCK_API_DATA;
   }
 
-  // 2. Process to get the latest match
   const matches = processMatches(rawData);
   const latestMatch = matches[matches.length - 1];
 
-  // Fallback if something breaks
   if (!latestMatch) {
     return new ImageResponse(
       (
@@ -47,19 +43,30 @@ export default async function Image() {
     );
   }
 
-  // 3. Prepare variables for the UI
-  const winnerName = latestMatch.winner === "aditya" ? "Aditya" : "Mahi";
   const primaryQuote = latestMatch.quotes[0];
   const secondaryQuote = latestMatch.quotes[1] || "Justice served.";
 
-  // 4. Load Fonts from local files
   const serifFontData = fs.readFileSync(
     path.join(process.cwd(), "public/fonts/PlayfairDisplay-Bold.ttf")
   );
 
   const sansFontData = fs.readFileSync(path.join(process.cwd(), "public/fonts/Inter-Regular.ttf"));
 
-  // 5. Render the Image
+  const getVerdictChar = () => {
+    switch (latestMatch.winner) {
+      case "aditya":
+        return "A";
+      case "mahi":
+        return "M";
+      case "tie":
+        return "T";
+      case "draw":
+        return "D";
+      default:
+        return "?";
+    }
+  };
+
   return new ImageResponse(
     (
       <div
@@ -77,7 +84,6 @@ export default async function Image() {
           padding: "40px",
         }}
       >
-        {/* Background Scale Icon (Opacity) */}
         <svg
           width="500"
           height="500"
@@ -100,7 +106,6 @@ export default async function Image() {
           <path d="M6 18h12" />
         </svg>
 
-        {/* Main Border Container */}
         <div
           style={{
             display: "flex",
@@ -114,7 +119,6 @@ export default async function Image() {
             position: "relative",
           }}
         >
-          {/* Top Header */}
           <div
             style={{
               display: "flex",
@@ -123,7 +127,6 @@ export default async function Image() {
               gap: "10px",
             }}
           >
-            {/* Gavel Icon */}
             <svg
               width="48"
               height="48"
@@ -171,7 +174,6 @@ export default async function Image() {
             </div>
           </div>
 
-          {/* Main Verdict Text */}
           <div
             style={{
               display: "flex",
@@ -219,7 +221,6 @@ export default async function Image() {
             </div>
           </div>
 
-          {/* Footer */}
           <div
             style={{
               display: "flex",
@@ -256,7 +257,6 @@ export default async function Image() {
             </div>
           </div>
 
-          {/* Official Verdict Stamp (Rotated) */}
           <div
             style={{
               position: "absolute",
@@ -295,7 +295,7 @@ export default async function Image() {
               <div style={{ display: "flex" }}>Official</div>
               <div style={{ display: "flex" }}>Verdict</div>
               <div style={{ display: "flex", fontSize: "24px", marginTop: "5px" }}>
-                {winnerName === "Aditya" ? "A" : "M"}
+                {getVerdictChar()}
               </div>
             </div>
           </div>

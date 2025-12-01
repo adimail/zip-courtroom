@@ -64,28 +64,38 @@ export function MatchList({ matches, selectedMatchId, onSelectMatch }: MatchList
                       ? "text-amber-500"
                       : match.winner === "aditya"
                         ? "text-indigo-700"
-                        : "text-emerald-700"
+                        : match.winner === "mahi"
+                          ? "text-emerald-700"
+                          : "text-slate-500"
                   )}
                 />
-                <span className="font-serif text-sm font-bold uppercase">{match.winner}</span>
-                <span
-                  className={cn(
-                    "text-[10px] uppercase",
-                    selectedMatchId === match.id ? "text-gray-500" : "text-gray-400"
-                  )}
-                >
-                  def.
-                </span>
-                <span
-                  className={cn(
-                    "text-xs uppercase line-through decoration-1",
-                    selectedMatchId === match.id
-                      ? "text-gray-500 decoration-gray-500"
-                      : "text-gray-400 decoration-gray-400"
-                  )}
-                >
-                  {match.loser}
-                </span>
+                {match.winner === "tie" || match.winner === "draw" ? (
+                  <span className="font-serif text-sm font-bold text-slate-500 uppercase">
+                    {match.winner}
+                  </span>
+                ) : (
+                  <>
+                    <span className="font-serif text-sm font-bold uppercase">{match.winner}</span>
+                    <span
+                      className={cn(
+                        "text-[10px] uppercase",
+                        selectedMatchId === match.id ? "text-gray-500" : "text-gray-400"
+                      )}
+                    >
+                      def.
+                    </span>
+                    <span
+                      className={cn(
+                        "text-xs uppercase line-through decoration-1",
+                        selectedMatchId === match.id
+                          ? "text-gray-500 decoration-gray-500"
+                          : "text-gray-400 decoration-gray-400"
+                      )}
+                    >
+                      {match.loser}
+                    </span>
+                  </>
+                )}
               </div>
               <div className="flex items-center gap-1 font-mono text-xs">
                 <Timer className="h-3 w-3" />
