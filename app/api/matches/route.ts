@@ -46,11 +46,10 @@ export async function fetchMatches() {
     }
 
     const matchData = rows.map((row) => ({
-      date: row[0] || "Unknown Date",
-      puzzleNo: row[1] || "???",
-      aditya: parseTime(row[2]),
-      mahi: parseTime(row[3]),
-      prize: row[4] || null,
+      puzzleNo: row[0] || "???",
+      aditya: parseTime(row[1]),
+      mahi: parseTime(row[2]),
+      prize: row[3] || null,
     }));
 
     return matchData;
