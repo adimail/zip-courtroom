@@ -4,7 +4,7 @@ import { MatchResult } from "@/lib/courtroom";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { MouseEvent } from "react";
-import { DayPicker, DayContentProps, DayModifiers } from "react-day-picker";
+import { DayPicker, Modifiers } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { parse, format } from "date-fns";
 
@@ -37,14 +37,6 @@ export function VictoryCalendar({ matches, onDayHover }: VictoryCalendarProps) {
     }
   });
 
-  function CustomDayContent(props: DayContentProps) {
-    return (
-      <div className="flex size-full items-center justify-center text-center">
-        {props.date.getDate()}
-      </div>
-    );
-  }
-
   const handleDayClick = (day: Date) => {
     const dateKey = format(day, "yyyy-MM-dd");
     const match = dateToMatchMap.get(dateKey);
@@ -53,7 +45,7 @@ export function VictoryCalendar({ matches, onDayHover }: VictoryCalendarProps) {
     }
   };
 
-  const handleDayMouseEnter = (day: Date, _: DayModifiers, e: MouseEvent) => {
+  const handleDayMouseEnter = (day: Date, _: Modifiers, e: MouseEvent) => {
     const dateKey = format(day, "yyyy-MM-dd");
     const match = dateToMatchMap.get(dateKey);
     if (match) {
@@ -124,9 +116,6 @@ export function VictoryCalendar({ matches, onDayHover }: VictoryCalendarProps) {
           }}
           showOutsideDays
           fixedWeeks
-          components={{
-            DayContent: CustomDayContent,
-          }}
         />
 
         <div className="mt-4 flex flex-wrap justify-center gap-4 text-xs font-medium tracking-wider uppercase">
