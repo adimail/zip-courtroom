@@ -1,6 +1,14 @@
+export type Difficulty = "easy" | "medium" | "hard";
+
 export interface Point {
   r: number;
   c: number;
+}
+
+export interface Wall {
+  r: number;
+  c: number;
+  type: "vertical" | "horizontal";
 }
 
 export interface LevelData {
@@ -9,6 +17,7 @@ export interface LevelData {
   checkpoints: Record<string, number>;
   maxNumber: number;
   startPoint: Point;
+  walls: Wall[];
 }
 
 export interface GameState {

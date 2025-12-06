@@ -1,11 +1,12 @@
-import { ArrowLeft, HelpCircle } from "lucide-react";
+import { ArrowLeft, HelpCircle, Settings } from "lucide-react";
 import Link from "next/link";
 
 interface GameHeaderProps {
   onShowTutorial: () => void;
+  onShowSettings: () => void;
 }
 
-export function GameHeader({ onShowTutorial }: GameHeaderProps) {
+export function GameHeader({ onShowTutorial, onShowSettings }: GameHeaderProps) {
   return (
     <div className="mb-6 flex w-full max-w-md items-center justify-between">
       <Link
@@ -16,12 +17,20 @@ export function GameHeader({ onShowTutorial }: GameHeaderProps) {
         Exit Case
       </Link>
       <div className="font-serif text-xl font-bold tracking-wider uppercase">ZIP</div>
-      <button
-        onClick={onShowTutorial}
-        className="rounded-full border border-gray-500 p-1 hover:bg-gray-200 dark:hover:bg-gray-800"
-      >
-        <HelpCircle className="h-4 w-4" />
-      </button>
+      <div className="flex gap-2">
+        <button
+          onClick={onShowSettings}
+          className="rounded-full border border-gray-500 p-1 hover:bg-gray-200 dark:hover:bg-gray-800"
+        >
+          <Settings className="h-4 w-4" />
+        </button>
+        <button
+          onClick={onShowTutorial}
+          className="rounded-full border border-gray-500 p-1 hover:bg-gray-200 dark:hover:bg-gray-800"
+        >
+          <HelpCircle className="h-4 w-4" />
+        </button>
+      </div>
     </div>
   );
 }

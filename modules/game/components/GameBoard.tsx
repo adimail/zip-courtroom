@@ -3,8 +3,9 @@ import { motion } from "motion/react";
 import { LevelData, Point } from "../types";
 import { cn } from "@/lib/utils";
 
-const CELL_SIZE = 60;
-const GAP = 8;
+const CELL_SIZE = 55; // Slightly smaller to fit 6x6 comfortably on mobile
+const GAP = 0; // No gap for the "grid" look with walls
+const BORDER_WIDTH = 1;
 
 interface GameBoardProps {
   level: LevelData;
@@ -24,8 +25,8 @@ export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoard
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    const col = Math.floor(x / (CELL_SIZE + GAP));
-    const row = Math.floor(y / (CELL_SIZE + GAP));
+    const col = Math.floor(x / CELL_SIZE);
+    const row = Math.floor(y / CELL_SIZE);
 
     if (row >= 0 && row < level.rows && col >= 0 && col < level.cols) {
       return { r: row, c: col };
@@ -33,8 +34,25 @@ export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoard
     return null;
   };
 
+  const isWallBlocking = (current: Point, next: Point) => {
+    // Check if there is a wall between current and next
+    // Vertical wall check
+    if (current.r === next.r) {
+      const c = Math.min(current.c, next.c);
+      return level.walls.some((w) => w.type === "vertical" && w.r === current.r && w.c === c);
+    }
+    // Horizontal wall check
+    if (current.c === next.c) {
+      const r = Math.min(current.r, next.r);
+      return level.walls.some((w) => w.type === "horizontal" && w.r === r && w.c === current.c);
+    }
+    return false;
+  };
+
   const isValidMove = (current: Point, next: Point) => {
-    return Math.abs(current.r - next.r) + Math.abs(current.c - next.c) === 1;
+    const isAdjacent = Math.abs(current.r - next.r) + Math.abs(current.c - next.c) === 1;
+    if (!isAdjacent) return false;
+    return !isWallBlocking(current, next);
   };
 
   const getCurrentSegmentNumber = () => {
@@ -110,10 +128,10 @@ export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoard
 
   return (
     <div
-      className="relative mx-auto touch-none rounded-xl bg-[#1C1C1C] p-4 shadow-2xl select-none dark:bg-[#000000]"
+      className="relative mx-auto touch-none rounded-xl bg-[#EBE8E1] p-1 shadow-2xl select-none dark:bg-[#1C1C1C]"
       style={{
-        width: level.cols * (CELL_SIZE + GAP) + GAP * 2 + 32,
-        height: level.rows * (CELL_SIZE + GAP) + GAP * 2 + 32,
+        width: level.cols * CELL_SIZE + 8, // + padding
+        height: level.rows * CELL_SIZE + 8,
       }}
     >
       <div
@@ -122,13 +140,15 @@ export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoard
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerUp}
-        className="relative"
+        className="relative overflow-hidden rounded-lg border-2 border-gray-400 bg-white dark:border-gray-600 dark:bg-[#2A2A2A]"
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${level.cols}, ${CELL_SIZE}px)`,
-          gap: GAP,
+          width: level.cols * CELL_SIZE,
+          height: level.rows * CELL_SIZE,
         }}
       >
+        {/* Grid Cells */}
         {Array.from({ length: level.rows * level.cols }).map((_, i) => {
           const r = Math.floor(i / level.cols);
           const c = i % level.cols;
@@ -140,17 +160,18 @@ export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoard
             <div
               key={key}
               className={cn(
-                "flex items-center justify-center rounded-lg text-2xl font-bold transition-colors duration-200",
-                isPath ? "bg-blue-500/20" : "bg-[#2A2A2A]",
-                num ? "z-10" : "z-0"
+                "relative flex items-center justify-center border-[0.5px] border-gray-200 transition-colors duration-200 dark:border-gray-700",
+                isPath ? "bg-blue-100 dark:bg-blue-900/30" : "bg-transparent"
               )}
               style={{ width: CELL_SIZE, height: CELL_SIZE }}
             >
               {num && (
                 <div
                   className={cn(
-                    "flex h-10 w-10 items-center justify-center rounded-full shadow-sm",
-                    isPath ? "bg-blue-500 text-white" : "bg-[#EBE8E1] text-[#1C1C1C]"
+                    "flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold shadow-sm",
+                    isPath
+                      ? "bg-blue-600 text-white"
+                      : "bg-[#1C1C1C] text-[#EBE8E1] dark:bg-[#EBE8E1] dark:text-[#1C1C1C]"
                   )}
                 >
                   {num}
@@ -160,23 +181,49 @@ export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoard
           );
         })}
 
+        {/* Walls */}
+        {level.walls.map((wall, i) => (
+          <div
+            key={`wall-${i}`}
+            className="absolute bg-black dark:bg-white"
+            style={{
+              zIndex: 20,
+              ...(wall.type === "vertical"
+                ? {
+                    width: "4px",
+                    height: `${CELL_SIZE}px`,
+                    left: `${(wall.c + 1) * CELL_SIZE - 2}px`,
+                    top: `${wall.r * CELL_SIZE}px`,
+                  }
+                : {
+                    height: "4px",
+                    width: `${CELL_SIZE}px`,
+                    top: `${(wall.r + 1) * CELL_SIZE - 2}px`,
+                    left: `${wall.c * CELL_SIZE}px`,
+                  }),
+            }}
+          />
+        ))}
+
+        {/* Path SVG */}
         <svg
           className="pointer-events-none absolute top-0 left-0 h-full w-full overflow-visible"
-          style={{ zIndex: 5 }}
+          style={{ zIndex: 10 }}
         >
           <motion.path
             d={path
               .map((p, i) => {
-                const x = p.c * (CELL_SIZE + GAP) + CELL_SIZE / 2;
-                const y = p.r * (CELL_SIZE + GAP) + CELL_SIZE / 2;
+                const x = p.c * CELL_SIZE + CELL_SIZE / 2;
+                const y = p.r * CELL_SIZE + CELL_SIZE / 2;
                 return `${i === 0 ? "M" : "L"} ${x} ${y}`;
               })
               .join(" ")}
             fill="none"
             stroke="#3b82f6"
-            strokeWidth={CELL_SIZE * 0.6}
+            strokeWidth={CELL_SIZE * 0.4}
             strokeLinecap="round"
             strokeLinejoin="round"
+            strokeOpacity={0.8}
             initial={false}
             animate={{ pathLength: 1 }}
           />

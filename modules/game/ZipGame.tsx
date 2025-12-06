@@ -3,25 +3,28 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { AnimatePresence } from "motion/react";
 import { generateLevel } from "./generator";
-import { LevelData, Point } from "./types";
+import { LevelData, Point, Difficulty } from "./types";
 import { GameHeader } from "./components/GameHeader";
 import { GameBoard } from "./components/GameBoard";
 import { GameControls } from "./components/GameControls";
 import { TutorialModal } from "./components/TutorialModal";
 import { VictoryModal } from "./components/VictoryModal";
+import { GameSettings } from "./components/GameSettings";
 
 export function ZipGame() {
   const [level, setLevel] = useState<LevelData | null>(null);
   const [path, setPath] = useState<Point[]>([]);
+  const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [showTutorial, setShowTutorial] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
   const [isWon, setIsWon] = useState(false);
 
   const initGame = useCallback(() => {
-    const newLevel = generateLevel(6, 5);
+    const newLevel = generateLevel(difficulty, 6, 6);
     setLevel(newLevel);
     setPath([newLevel.startPoint]);
     setIsWon(false);
-  }, []);
+  }, [difficulty]);
 
   useEffect(() => {
     initGame();
@@ -44,7 +47,10 @@ export function ZipGame() {
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-[#EBE8E1] p-4 pt-8 font-sans text-[#1C1C1C] md:pt-12 dark:bg-[#1C1C1C] dark:text-[#EBE8E1]">
-      <GameHeader onShowTutorial={() => setShowTutorial(true)} />
+      <GameHeader
+        onShowTutorial={() => setShowTutorial(true)}
+        onShowSettings={() => setShowSettings(true)}
+      />
 
       <GameBoard
         level={level}
@@ -63,6 +69,16 @@ export function ZipGame() {
 
       <AnimatePresence>
         {showTutorial && <TutorialModal onClose={() => setShowTutorial(false)} />}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showSettings && (
+          <GameSettings
+            currentDifficulty={difficulty}
+            onDifficultyChange={setDifficulty}
+            onClose={() => setShowSettings(false)}
+          />
+        )}
       </AnimatePresence>
 
       <AnimatePresence>{isWon && <VictoryModal onNext={initGame} />}</AnimatePresence>
