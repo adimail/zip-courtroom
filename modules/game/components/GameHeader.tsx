@@ -1,5 +1,13 @@
 import { useState, useRef, useEffect } from "react";
-import { ArrowLeft, HelpCircle, Settings, ChevronDown, Check } from "lucide-react";
+import {
+  ArrowLeft,
+  HelpCircle,
+  Settings,
+  ChevronDown,
+  Check,
+  Share2,
+  CheckCircle2,
+} from "lucide-react";
 import Link from "next/link";
 import { Difficulty } from "../types";
 import { cn } from "@/lib/utils";
@@ -8,10 +16,17 @@ interface GameHeaderProps {
   difficulty: Difficulty;
   onDifficultyChange: (d: Difficulty) => void;
   onShowTutorial: () => void;
+  onShare: () => void;
 }
 
-export function GameHeader({ difficulty, onDifficultyChange, onShowTutorial }: GameHeaderProps) {
+export function GameHeader({
+  difficulty,
+  onDifficultyChange,
+  onShowTutorial,
+  onShare,
+}: GameHeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,6 +38,12 @@ export function GameHeader({ difficulty, onDifficultyChange, onShowTutorial }: G
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleShareClick = () => {
+    onShare();
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
 
   const difficulties: Difficulty[] = ["easy", "medium", "hard"];
 
@@ -39,14 +60,29 @@ export function GameHeader({ difficulty, onDifficultyChange, onShowTutorial }: G
       <div className="font-serif text-xl font-bold tracking-wider uppercase">ZIP</div>
 
       <div className="flex items-center gap-2">
+        <button
+          onClick={handleShareClick}
+          className={cn(
+            "flex cursor-pointer items-center justify-center rounded-full border p-1 transition-all",
+            isCopied
+              ? "border-green-500 bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+              : "border-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800"
+          )}
+          title="Share Puzzle"
+        >
+          {isCopied ? <CheckCircle2 className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
+        </button>
+
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center gap-1.5 rounded-full border border-gray-500 px-3 py-1 text-[10px] font-bold tracking-wider uppercase transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
+            className="flex cursor-pointer items-center gap-1.5 rounded-full border border-gray-500 px-3 py-1 text-[10px] font-bold tracking-wider uppercase transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
           >
             <Settings className="h-3 w-3" />
             <span>{difficulty}</span>
-            <ChevronDown className={cn("h-3 w-3 transition-transform", isOpen && "rotate-180")} />
+            <ChevronDown
+              className={cn("h-3 w-3 cursor-pointer transition-transform", isOpen && "rotate-180")}
+            />
           </button>
 
           {isOpen && (
@@ -59,7 +95,7 @@ export function GameHeader({ difficulty, onDifficultyChange, onShowTutorial }: G
                     setIsOpen(false);
                   }}
                   className={cn(
-                    "flex w-full items-center justify-between px-3 py-2 text-left text-[10px] font-bold uppercase transition-colors hover:bg-gray-100 dark:hover:bg-[#2A2A2A]",
+                    "flex w-full cursor-pointer items-center justify-between px-3 py-2 text-left text-[10px] font-bold uppercase transition-colors hover:bg-gray-100 dark:hover:bg-[#2A2A2A]",
                     difficulty === d
                       ? "text-amber-600 dark:text-amber-500"
                       : "text-gray-600 dark:text-gray-400"
@@ -75,7 +111,7 @@ export function GameHeader({ difficulty, onDifficultyChange, onShowTutorial }: G
 
         <button
           onClick={onShowTutorial}
-          className="rounded-full border border-gray-500 p-1 hover:bg-gray-200 dark:hover:bg-gray-800"
+          className="cursor-pointer rounded-full border border-gray-500 p-1 hover:bg-gray-200 dark:hover:bg-gray-800"
         >
           <HelpCircle className="h-4 w-4" />
         </button>

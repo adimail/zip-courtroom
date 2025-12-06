@@ -22,7 +22,7 @@ export function TutorialModal({ onClose }: TutorialModalProps) {
         <div className="flex items-center justify-between border-b border-[#333] p-4">
           <h2 className="font-serif text-lg font-bold">How to play Zip</h2>
           <button onClick={onClose}>
-            <X className="h-5 w-5 text-gray-400" />
+            <X className="h-5 w-5 cursor-pointer text-gray-400" />
           </button>
         </div>
         <div className="p-6">
@@ -59,7 +59,7 @@ export function TutorialModal({ onClose }: TutorialModalProps) {
           </p>
           <button
             onClick={onClose}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-blue-600 py-3 font-bold text-white transition-colors hover:bg-blue-500"
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-blue-600 py-3 font-bold text-white transition-colors hover:bg-blue-500"
           >
             <Play className="h-4 w-4 fill-current" /> Play Game
           </button>

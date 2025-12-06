@@ -2,16 +2,21 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { AnimatePresence } from "motion/react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { generateLevel } from "./generator";
+import { serializeLevel, deserializeLevel } from "./serializer";
 import { LevelData, Point, Difficulty } from "./types";
 import { GameHeader } from "./components/GameHeader";
 import { GameBoard } from "./components/GameBoard";
 import { GameControls } from "./components/GameControls";
 import { GameStatus } from "./components/GameStatus";
 import { TutorialModal } from "./components/TutorialModal";
-import { VictoryModal } from "./components/VictoryModal";
 
 export function ZipGame() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [level, setLevel] = useState<LevelData | null>(null);
   const [path, setPath] = useState<Point[]>([]);
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
@@ -21,19 +26,57 @@ export function ZipGame() {
   const [finalTime, setFinalTime] = useState<number>(0);
   const [isPaused, setIsPaused] = useState(true);
 
-  const initGame = useCallback(() => {
-    const newLevel = generateLevel(difficulty, 6, 6);
-    setLevel(newLevel);
-    setPath([newLevel.startPoint]);
-    setGameStatus("playing");
-    setFinalTime(0);
-    setStartTime(null);
-    setIsPaused(true);
-  }, [difficulty]);
+  const initGame = useCallback(
+    (forceRandom = false) => {
+      const gridParam = searchParams.get("grid");
+
+      if (!forceRandom && gridParam) {
+        const decodedLevel = deserializeLevel(gridParam);
+        if (decodedLevel) {
+          setLevel(decodedLevel);
+          setPath([decodedLevel.startPoint]);
+          setGameStatus("playing");
+          setFinalTime(0);
+          setStartTime(null);
+          setIsPaused(true);
+          return;
+        }
+      }
+
+      const newLevel = generateLevel(difficulty, 6, 6);
+      setLevel(newLevel);
+      setPath([newLevel.startPoint]);
+      setGameStatus("playing");
+      setFinalTime(0);
+      setStartTime(null);
+      setIsPaused(true);
+
+      if (gridParam) {
+        router.replace(pathname);
+      }
+    },
+    [difficulty, searchParams, pathname, router]
+  );
 
   useEffect(() => {
     initGame();
   }, [initGame]);
+
+  const handleDifficultyChange = (newDifficulty: Difficulty) => {
+    setDifficulty(newDifficulty);
+    router.replace(pathname);
+  };
+
+  const handleNewGame = () => {
+    initGame(true);
+  };
+
+  const handleShare = () => {
+    if (!level) return;
+    const encoded = serializeLevel(level);
+    const url = `${window.location.origin}${pathname}?grid=${encoded}`;
+    navigator.clipboard.writeText(url);
+  };
 
   const handleStartGame = () => {
     setIsPaused(false);
@@ -82,8 +125,9 @@ export function ZipGame() {
     <div className="flex min-h-screen flex-col items-center bg-[#EBE8E1] p-4 pt-8 font-sans text-[#1C1C1C] md:pt-12 dark:bg-[#1C1C1C] dark:text-[#EBE8E1]">
       <GameHeader
         difficulty={difficulty}
-        onDifficultyChange={setDifficulty}
+        onDifficultyChange={handleDifficultyChange}
         onShowTutorial={() => setShowTutorial(true)}
+        onShare={handleShare}
       />
 
       <GameBoard
@@ -101,16 +145,12 @@ export function ZipGame() {
       <GameControls
         onUndo={handleUndo}
         onReset={handleReset}
-        onNewGame={initGame}
+        onNewGame={handleNewGame}
         canUndo={path.length > 1 && gameStatus !== "won" && !isPaused}
       />
 
       <AnimatePresence>
         {showTutorial && <TutorialModal onClose={handleTutorialClose} />}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {gameStatus === "won" && <VictoryModal onNext={initGame} />}
       </AnimatePresence>
     </div>
   );
