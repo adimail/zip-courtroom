@@ -1,5 +1,4 @@
 import React, { useRef, useState } from "react";
-import { motion } from "motion/react";
 import { LevelData, Point } from "../types";
 import { cn } from "@/lib/utils";
 import { Play } from "lucide-react";
@@ -133,6 +132,17 @@ export function GameBoard({
     e.currentTarget.releasePointerCapture(e.pointerId);
   };
 
+  const getPathColor = (index: number, total: number) => {
+    const progress = total > 1 ? index / (total - 1) : 0;
+    const lightness = 45 + progress * 20;
+    return `hsl(217, 90%, ${lightness}%)`;
+  };
+
+  const pathPoints = path.map((p) => ({
+    x: p.c * CELL_SIZE + CELL_SIZE / 2,
+    y: p.r * CELL_SIZE + CELL_SIZE / 2,
+  }));
+
   return (
     <div
       className="relative mx-auto mt-5 touch-none rounded-xl bg-[#EBE8E1] p-1 shadow-2xl select-none dark:bg-[#1C1C1C]"
@@ -163,7 +173,13 @@ export function GameBoard({
           const c = i % level.cols;
           const key = `${r},${c}`;
           const num = level.checkpoints[key];
-          const isPath = path.some((p) => p.r === r && p.c === c);
+
+          const pathIndex = path.findIndex((p) => p.r === r && p.c === c);
+          const isPath = pathIndex !== -1;
+
+          const bubbleStyle = isPath
+            ? { backgroundColor: getPathColor(pathIndex, path.length), color: "white" }
+            : undefined;
 
           return (
             <div
@@ -175,14 +191,7 @@ export function GameBoard({
               style={{ width: CELL_SIZE, height: CELL_SIZE }}
             >
               {num && (
-                <div
-                  className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold shadow-sm",
-                    isPath
-                      ? "bg-blue-600 text-white"
-                      : "bg-[#1C1C1C] text-[#EBE8E1] dark:bg-[#EBE8E1] dark:text-[#1C1C1C]"
-                  )}
-                >
+                <div className="relative z-30 flex h-8 w-8 items-center justify-center rounded-full bg-[#1C1C1C] text-sm font-bold text-white shadow-sm dark:bg-[#EBE8E1] dark:text-[#1C1C1C]">
                   {num}
                 </div>
               )}
@@ -217,23 +226,32 @@ export function GameBoard({
           className="pointer-events-none absolute top-0 left-0 h-full w-full overflow-visible"
           style={{ zIndex: 10 }}
         >
-          <motion.path
-            d={path
-              .map((p, i) => {
-                const x = p.c * CELL_SIZE + CELL_SIZE / 2;
-                const y = p.r * CELL_SIZE + CELL_SIZE / 2;
-                return `${i === 0 ? "M" : "L"} ${x} ${y}`;
-              })
-              .join(" ")}
-            fill="none"
-            stroke="#3b82f6"
-            strokeWidth={CELL_SIZE * 0.4}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeOpacity={0.8}
-            initial={false}
-            animate={{ pathLength: 1 }}
-          />
+          <defs>
+            <linearGradient id="pathGradient" gradientUnits="userSpaceOnUse">
+              {path.length > 1 &&
+                pathPoints.map((point, i) => {
+                  const progress = i / (path.length - 1);
+                  const lightness = 30 + progress * 30;
+                  return (
+                    <stop
+                      key={i}
+                      offset={`${progress * 100}%`}
+                      stopColor={`hsl(217, 90%, ${lightness}%)`}
+                    />
+                  );
+                })}
+            </linearGradient>
+          </defs>
+          {path.length > 1 && (
+            <polyline
+              points={pathPoints.map((p) => `${p.x},${p.y}`).join(" ")}
+              fill="none"
+              stroke="url(#pathGradient)"
+              strokeWidth={CELL_SIZE * 0.4}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          )}
         </svg>
       </div>
 
