@@ -7,39 +7,72 @@ import { LevelData, Point, Difficulty } from "./types";
 import { GameHeader } from "./components/GameHeader";
 import { GameBoard } from "./components/GameBoard";
 import { GameControls } from "./components/GameControls";
+import { GameStatus } from "./components/GameStatus";
 import { TutorialModal } from "./components/TutorialModal";
 import { VictoryModal } from "./components/VictoryModal";
-import { GameSettings } from "./components/GameSettings";
 
 export function ZipGame() {
   const [level, setLevel] = useState<LevelData | null>(null);
   const [path, setPath] = useState<Point[]>([]);
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [showTutorial, setShowTutorial] = useState(true);
-  const [showSettings, setShowSettings] = useState(false);
-  const [isWon, setIsWon] = useState(false);
+  const [gameStatus, setGameStatus] = useState<"playing" | "won" | "incomplete">("playing");
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [finalTime, setFinalTime] = useState<number>(0);
+  const [isPaused, setIsPaused] = useState(true);
 
   const initGame = useCallback(() => {
     const newLevel = generateLevel(difficulty, 6, 6);
     setLevel(newLevel);
     setPath([newLevel.startPoint]);
-    setIsWon(false);
+    setGameStatus("playing");
+    setFinalTime(0);
+    setStartTime(null);
+    setIsPaused(true);
   }, [difficulty]);
 
   useEffect(() => {
     initGame();
   }, [initGame]);
 
+  const handleStartGame = () => {
+    setIsPaused(false);
+    setStartTime(Date.now());
+  };
+
+  const handleTutorialClose = () => {
+    setShowTutorial(false);
+  };
+
+  const handlePathChange = (newPath: Point[]) => {
+    setPath(newPath);
+    if (gameStatus === "incomplete") {
+      setGameStatus("playing");
+    }
+  };
+
+  const handleAttemptFinish = (isSuccess: boolean) => {
+    if (isSuccess) {
+      setGameStatus("won");
+      if (startTime) {
+        setFinalTime((Date.now() - startTime) / 1000);
+      }
+    } else {
+      setGameStatus("incomplete");
+    }
+  };
+
   const handleUndo = () => {
-    if (path.length > 1 && !isWon) {
+    if (path.length > 1 && gameStatus !== "won" && !isPaused) {
       setPath((prev) => prev.slice(0, -1));
+      setGameStatus("playing");
     }
   };
 
   const handleReset = () => {
-    if (level) {
+    if (level && !isPaused) {
       setPath([level.startPoint]);
-      setIsWon(false);
+      setGameStatus("playing");
     }
   };
 
@@ -48,40 +81,37 @@ export function ZipGame() {
   return (
     <div className="flex min-h-screen flex-col items-center bg-[#EBE8E1] p-4 pt-8 font-sans text-[#1C1C1C] md:pt-12 dark:bg-[#1C1C1C] dark:text-[#EBE8E1]">
       <GameHeader
+        difficulty={difficulty}
+        onDifficultyChange={setDifficulty}
         onShowTutorial={() => setShowTutorial(true)}
-        onShowSettings={() => setShowSettings(true)}
       />
 
       <GameBoard
         level={level}
         path={path}
-        onPathChange={setPath}
-        onWin={() => setIsWon(true)}
-        isWon={isWon}
+        onPathChange={handlePathChange}
+        onAttemptFinish={handleAttemptFinish}
+        isWon={gameStatus === "won"}
+        isPaused={isPaused}
+        onStartGame={handleStartGame}
       />
+
+      <GameStatus status={gameStatus} startTime={startTime} finalTime={finalTime} />
 
       <GameControls
         onUndo={handleUndo}
         onReset={handleReset}
         onNewGame={initGame}
-        canUndo={path.length > 1 && !isWon}
+        canUndo={path.length > 1 && gameStatus !== "won" && !isPaused}
       />
 
       <AnimatePresence>
-        {showTutorial && <TutorialModal onClose={() => setShowTutorial(false)} />}
+        {showTutorial && <TutorialModal onClose={handleTutorialClose} />}
       </AnimatePresence>
 
       <AnimatePresence>
-        {showSettings && (
-          <GameSettings
-            currentDifficulty={difficulty}
-            onDifficultyChange={setDifficulty}
-            onClose={() => setShowSettings(false)}
-          />
-        )}
+        {gameStatus === "won" && <VictoryModal onNext={initGame} />}
       </AnimatePresence>
-
-      <AnimatePresence>{isWon && <VictoryModal onNext={initGame} />}</AnimatePresence>
     </div>
   );
 }

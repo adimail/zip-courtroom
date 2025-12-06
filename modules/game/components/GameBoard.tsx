@@ -2,20 +2,29 @@ import React, { useRef, useState } from "react";
 import { motion } from "motion/react";
 import { LevelData, Point } from "../types";
 import { cn } from "@/lib/utils";
+import { Play } from "lucide-react";
 
-const CELL_SIZE = 55; // Slightly smaller to fit 6x6 comfortably on mobile
-const GAP = 0; // No gap for the "grid" look with walls
-const BORDER_WIDTH = 1;
+const CELL_SIZE = 55;
 
 interface GameBoardProps {
   level: LevelData;
   path: Point[];
   onPathChange: (newPath: Point[]) => void;
-  onWin: () => void;
+  onAttemptFinish: (isSuccess: boolean) => void;
   isWon: boolean;
+  isPaused: boolean;
+  onStartGame: () => void;
 }
 
-export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoardProps) {
+export function GameBoard({
+  level,
+  path,
+  onPathChange,
+  onAttemptFinish,
+  isWon,
+  isPaused,
+  onStartGame,
+}: GameBoardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -35,13 +44,10 @@ export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoard
   };
 
   const isWallBlocking = (current: Point, next: Point) => {
-    // Check if there is a wall between current and next
-    // Vertical wall check
     if (current.r === next.r) {
       const c = Math.min(current.c, next.c);
       return level.walls.some((w) => w.type === "vertical" && w.r === current.r && w.c === c);
     }
-    // Horizontal wall check
     if (current.c === next.c) {
       const r = Math.min(current.r, next.r);
       return level.walls.some((w) => w.type === "horizontal" && w.r === r && w.c === current.c);
@@ -64,18 +70,19 @@ export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoard
     return max;
   };
 
-  const checkWinCondition = (currentPath: Point[]) => {
-    const totalCells = level.rows * level.cols;
+  const checkCompletion = (currentPath: Point[]) => {
     const head = currentPath[currentPath.length - 1];
     const headVal = level.checkpoints[`${head.r},${head.c}`];
 
-    if (currentPath.length === totalCells && headVal === level.maxNumber) {
-      onWin();
+    if (headVal === level.maxNumber) {
+      const totalCells = level.rows * level.cols;
+      const isFull = currentPath.length === totalCells;
+      onAttemptFinish(isFull);
     }
   };
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (isWon) return;
+    if (isWon || isPaused) return;
     const p = getPointFromEvent(e);
     if (!p) return;
 
@@ -87,7 +94,7 @@ export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoard
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDragging || isWon) return;
+    if (!isDragging || isWon || isPaused) return;
 
     const p = getPointFromEvent(e);
     if (!p) return;
@@ -118,7 +125,7 @@ export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoard
 
     const newPath = [...path, p];
     onPathChange(newPath);
-    checkWinCondition(newPath);
+    checkCompletion(newPath);
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
@@ -130,7 +137,7 @@ export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoard
     <div
       className="relative mx-auto touch-none rounded-xl bg-[#EBE8E1] p-1 shadow-2xl select-none dark:bg-[#1C1C1C]"
       style={{
-        width: level.cols * CELL_SIZE + 8, // + padding
+        width: level.cols * CELL_SIZE + 8,
         height: level.rows * CELL_SIZE + 8,
       }}
     >
@@ -140,7 +147,10 @@ export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoard
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerUp}
-        className="relative overflow-hidden rounded-lg border-2 border-gray-400 bg-white dark:border-gray-600 dark:bg-[#2A2A2A]"
+        className={cn(
+          "relative overflow-hidden rounded-lg border-2 border-gray-400 bg-white transition-all duration-300 dark:border-gray-600 dark:bg-[#2A2A2A]",
+          isPaused && "blur-md filter"
+        )}
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${level.cols}, ${CELL_SIZE}px)`,
@@ -148,7 +158,6 @@ export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoard
           height: level.rows * CELL_SIZE,
         }}
       >
-        {/* Grid Cells */}
         {Array.from({ length: level.rows * level.cols }).map((_, i) => {
           const r = Math.floor(i / level.cols);
           const c = i % level.cols;
@@ -181,7 +190,6 @@ export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoard
           );
         })}
 
-        {/* Walls */}
         {level.walls.map((wall, i) => (
           <div
             key={`wall-${i}`}
@@ -205,7 +213,6 @@ export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoard
           />
         ))}
 
-        {/* Path SVG */}
         <svg
           className="pointer-events-none absolute top-0 left-0 h-full w-full overflow-visible"
           style={{ zIndex: 10 }}
@@ -229,6 +236,17 @@ export function GameBoard({ level, path, onPathChange, onWin, isWon }: GameBoard
           />
         </svg>
       </div>
+
+      {isPaused && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center">
+          <button
+            onClick={onStartGame}
+            className="flex h-20 w-20 cursor-pointer items-center justify-center rounded-full bg-amber-500 text-[#1C1C1C] shadow-xl transition-transform hover:scale-105 active:scale-95"
+          >
+            <Play className="h-10 w-10 fill-current" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
