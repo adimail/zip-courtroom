@@ -39,6 +39,24 @@ export interface CourtStats {
   mahiAvgTime: number;
 }
 
+export function getDeterministicVerdict<T>(caseId: string, winnerId: string, verdicts: T[]): T {
+  if (!verdicts || verdicts.length === 0) {
+    throw new Error("The verdicts array cannot be empty.");
+  }
+
+  const combinedString = `${caseId}-${winnerId}`;
+  let hash = 0;
+
+  for (let i = 0; i < combinedString.length; i++) {
+    const charCode = combinedString.charCodeAt(i);
+    hash = (hash << 5) - hash + charCode;
+    hash |= 0;
+  }
+
+  const index = Math.abs(hash) % verdicts.length;
+  return verdicts[index];
+}
+
 export const VERDICT_QUOTES = [
   "Case closed. {W} is declared Not Guilty of Being Slow. {L} charged with First Degree Delay.",
   "Court finds in favor of {W}. {L}’s appeal denied due to insufficient speed.",
@@ -161,10 +179,6 @@ function calculateDate(puzzleNo: string): string {
   return format(targetDate, "d MMM yyyy");
 }
 
-function pickRandom(arr: string[]) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
 export function generateQuotes(
   winner: Player,
   loser: Player,
@@ -172,15 +186,18 @@ export function generateQuotes(
   streak: number,
   isNewRecord: boolean,
   winnerTime: number | null,
-  prize: string | null
+  prize: string | null,
+  puzzleNo: string
 ): string[] {
   if (winner === "draw") {
-    return [pickRandom(DRAW_QUOTES), "The court awaits their next appearance."];
+    const quote = getDeterministicVerdict(puzzleNo, "draw", DRAW_QUOTES);
+    return [quote, "The court awaits their next appearance."];
   }
 
   if (winner === "tie") {
+    const quote = getDeterministicVerdict(puzzleNo, "tie", TIE_QUOTES);
     return [
-      pickRandom(TIE_QUOTES) + ` Final time: ${winnerTime!.toFixed(2)}s.`,
+      quote + ` Final time: ${winnerTime!.toFixed(2)}s.`,
       "The court's decision is final: stalemate.",
     ];
   }
@@ -189,10 +206,11 @@ export function generateQuotes(
   const loserName = loser === "aditya" ? "Aditya" : "Mahi";
 
   if (diff === -1) {
-    return [pickRandom(DEFAULT_QUOTES).replaceAll("{W}", winnerName).replaceAll("{L}", loserName)];
+    const quote = getDeterministicVerdict(puzzleNo, `${winner}-default`, DEFAULT_QUOTES);
+    return [quote.replaceAll("{W}", winnerName).replaceAll("{L}", loserName)];
   }
 
-  const verdict = pickRandom(VERDICT_QUOTES)
+  const verdict = getDeterministicVerdict(puzzleNo, `${winner}-verdict`, VERDICT_QUOTES)
     .replaceAll("{W}", winnerName)
     .replaceAll("{L}", loserName)
     .replaceAll("{diff}", diff.toFixed(2));
@@ -201,7 +219,7 @@ export function generateQuotes(
 
   if (prize) {
     extras.push(
-      pickRandom(PRIZE_QUOTES)
+      getDeterministicVerdict(puzzleNo, `${winner}-prize`, PRIZE_QUOTES)
         .replaceAll("{W}", winnerName)
         .replaceAll("{L}", loserName)
         .replaceAll("{prize}", prize)
@@ -210,7 +228,7 @@ export function generateQuotes(
 
   if (streak >= 2) {
     extras.push(
-      pickRandom(STREAK_QUOTES)
+      getDeterministicVerdict(puzzleNo, `${winner}-streak`, STREAK_QUOTES)
         .replaceAll("{W}", winnerName)
         .replaceAll("{streak}", streak.toString())
         .replaceAll("{L}", loserName)
@@ -219,7 +237,7 @@ export function generateQuotes(
 
   if (isNewRecord && winnerTime !== null) {
     extras.push(
-      pickRandom(RECORD_QUOTES)
+      getDeterministicVerdict(puzzleNo, `${winner}-record`, RECORD_QUOTES)
         .replaceAll("{W}", winnerName)
         .replaceAll("{winnerTime}", winnerTime.toFixed(2))
     );
@@ -227,21 +245,23 @@ export function generateQuotes(
 
   if (diff > 15) {
     extras.push(
-      pickRandom(MERCY_QUOTES)
+      getDeterministicVerdict(puzzleNo, `${winner}-mercy`, MERCY_QUOTES)
         .replaceAll("{W}", winnerName)
         .replaceAll("{L}", loserName)
         .replaceAll("{diff}", diff.toFixed(2))
     );
   } else if (diff < 3) {
     extras.push(
-      pickRandom(CLOSE_CALL_QUOTES)
+      getDeterministicVerdict(puzzleNo, `${winner}-close`, CLOSE_CALL_QUOTES)
         .replaceAll("{W}", winnerName)
         .replaceAll("{L}", loserName)
         .replaceAll("{diff}", diff.toFixed(2))
     );
   } else {
     extras.push(
-      pickRandom(ROAST_QUOTES).replaceAll("{W}", winnerName).replaceAll("{L}", loserName)
+      getDeterministicVerdict(puzzleNo, `${winner}-roast`, ROAST_QUOTES)
+        .replaceAll("{W}", winnerName)
+        .replaceAll("{L}", loserName)
     );
   }
 
@@ -328,7 +348,8 @@ export function processMatches(data: RawData): MatchResult[] {
       currentStreak,
       isNewRecord,
       winnerTime,
-      match.prize
+      match.prize,
+      match.puzzleNo
     );
 
     matches.push({
