@@ -135,7 +135,7 @@ export function GameBoard({
 
   return (
     <div
-      className="relative mx-auto touch-none rounded-xl bg-[#EBE8E1] p-1 shadow-2xl select-none dark:bg-[#1C1C1C]"
+      className="relative mx-auto mt-5 touch-none rounded-xl bg-[#EBE8E1] p-1 shadow-2xl select-none dark:bg-[#1C1C1C]"
       style={{
         width: level.cols * CELL_SIZE + 8,
         height: level.rows * CELL_SIZE + 8,

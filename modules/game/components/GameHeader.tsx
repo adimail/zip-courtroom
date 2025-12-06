@@ -48,13 +48,13 @@ export function GameHeader({
   const difficulties: Difficulty[] = ["easy", "medium", "hard"];
 
   return (
-    <div className="mb-6 flex w-full max-w-md items-center justify-between">
+    <div className="mb-6 flex w-full max-w-2xl items-center justify-between">
       <Link
         href="/"
         className="flex items-center gap-2 text-xs font-bold tracking-widest text-gray-500 uppercase transition-colors hover:text-amber-600"
       >
         <ArrowLeft className="h-4 w-4" />
-        Exit Case
+        <span className="hidden md:block">Exit Case</span>
       </Link>
 
       <div className="font-serif text-xl font-bold tracking-wider uppercase">ZIP</div>

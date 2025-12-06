@@ -11,7 +11,7 @@ export function GameStatus({ status, startTime, finalTime }: GameStatusProps) {
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
-    if (status === "playing" && startTime) {
+    if (status !== "won" && startTime) {
       const interval = setInterval(() => {
         setElapsed((Date.now() - startTime) / 1000);
       }, 100);
