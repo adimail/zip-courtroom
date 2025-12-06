@@ -133,14 +133,14 @@ export function generateLevel(
   let maxGap = 5;
 
   if (difficulty === "easy") {
-    minGap = 3;
-    maxGap = 5;
+    minGap = 1;
+    maxGap = 3;
   } else if (difficulty === "medium") {
-    minGap = 5;
-    maxGap = 9;
+    minGap = 2;
+    maxGap = 3;
   } else if (difficulty === "hard") {
-    minGap = 8;
-    maxGap = 15;
+    minGap = 3;
+    maxGap = 6;
   }
 
   let currentIndex = 0;

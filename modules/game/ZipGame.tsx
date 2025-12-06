@@ -147,6 +147,7 @@ export function ZipGame() {
         onReset={handleReset}
         onNewGame={handleNewGame}
         canUndo={path.length > 1 && gameStatus !== "won" && !isPaused}
+        canReset={path.length > 1 && gameStatus !== "won" && !isPaused}
       />
 
       <AnimatePresence>

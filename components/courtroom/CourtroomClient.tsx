@@ -106,14 +106,14 @@ export function CourtroomClient({ matches }: CourtroomClientProps) {
               className="flex items-center gap-1.5 border border-amber-600 bg-amber-600 px-3 py-1.5 text-[10px] font-bold tracking-wider text-[#1C1C1C] uppercase transition-colors hover:bg-amber-500 md:text-xs"
             >
               <Gamepad2 className="h-3 w-3" />
-              <span>Play</span>
+              <span className="hidden md:block">Play</span>
             </Link>
             <Link
               href="/stats"
               className="flex items-center gap-1.5 border border-amber-600 bg-transparent px-3 py-1.5 text-[10px] font-bold tracking-wider text-amber-500 uppercase transition-colors hover:bg-amber-600 hover:text-[#1C1C1C] md:text-xs"
             >
               <BarChart3 className="h-3 w-3" />
-              <span>Stats</span>
+              <span className="hidden md:block">Stats</span>
             </Link>
           </div>
         </div>

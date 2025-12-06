@@ -5,9 +5,10 @@ interface GameControlsProps {
   onReset: () => void;
   onNewGame: () => void;
   canUndo: boolean;
+  canReset: boolean;
 }
 
-export function GameControls({ onUndo, onReset, onNewGame, canUndo }: GameControlsProps) {
+export function GameControls({ onUndo, onReset, onNewGame, canUndo, canReset }: GameControlsProps) {
   return (
     <div className="mt-8 flex justify-center gap-4">
       <button
@@ -19,7 +20,8 @@ export function GameControls({ onUndo, onReset, onNewGame, canUndo }: GameContro
       </button>
       <button
         onClick={onReset}
-        className="flex w-24 cursor-pointer items-center justify-center gap-2 rounded-full border border-[#1C1C1C] bg-[#F5F4F0] py-3 text-xs font-bold tracking-widest uppercase shadow-sm transition-transform active:scale-95 dark:border-gray-700 dark:bg-[#2A2A2A] dark:text-white"
+        disabled={!canReset}
+        className="flex w-24 cursor-pointer items-center justify-center gap-2 rounded-full border border-[#1C1C1C] bg-[#F5F4F0] py-3 text-xs font-bold tracking-widest uppercase shadow-sm transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-[#2A2A2A] dark:text-white"
       >
         <X className="h-3 w-3" /> Reset
       </button>
