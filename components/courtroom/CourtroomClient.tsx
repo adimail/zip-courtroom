@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { MatchResult } from "@/lib/courtroom";
 import { VerdictBanner } from "@/components/courtroom/VerdictBanner";
 import { MatchList } from "@/components/courtroom/MatchList";
-import { Gavel, BarChart3, Share2 } from "lucide-react";
+import { Gavel, BarChart3, Share2, BookOpen } from "lucide-react";
 import Link from "next/link";
 
 interface CourtroomClientProps {
@@ -146,13 +146,22 @@ export function CourtroomClient({ matches }: CourtroomClientProps) {
                   />
                 </div>
 
-                <button
-                  onClick={handleShare}
-                  className="mt-3 flex cursor-pointer items-center gap-1.5 border border-amber-600 bg-black/80 px-3 py-1.5 text-[10px] font-bold tracking-wider text-amber-500 uppercase transition-colors hover:bg-amber-600 hover:text-[#1C1C1C]"
-                >
-                  <Share2 className="h-3 w-3" />
-                  Share Verdict
-                </button>
+                <div className="mt-3 flex items-center gap-2">
+                  <button
+                    onClick={handleShare}
+                    className="flex cursor-pointer items-center gap-1.5 border border-amber-600 bg-black/80 px-3 py-1.5 text-[10px] font-bold tracking-wider text-amber-500 uppercase transition-colors hover:bg-amber-600 hover:text-[#1C1C1C]"
+                  >
+                    <Share2 className="h-3 w-3" />
+                    Share Verdict
+                  </button>
+                  <Link
+                    href={`/case/${selectedMatch.puzzleNo}`}
+                    className="flex cursor-pointer items-center gap-1.5 border border-amber-600 bg-black/80 px-3 py-1.5 text-[10px] font-bold tracking-wider text-amber-500 uppercase transition-colors hover:bg-amber-600 hover:text-[#1C1C1C]"
+                  >
+                    <BookOpen className="h-3 w-3" />
+                    Open Verdict
+                  </Link>
+                </div>
               </div>
             ) : (
               <div className="flex h-48 items-center justify-center border border-dashed border-[#1C1C1C] bg-transparent">
