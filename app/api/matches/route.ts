@@ -1,6 +1,5 @@
 import { google } from "googleapis";
 import { NextResponse } from "next/server";
-import path from "path";
 
 const SPREADSHEET_ID = "1YQ2xoLyN4pXqhuicquJZGWbV6x7wy8vqeCQ5FT05g_0";
 const RANGE = "Sheet1!A2:E";
@@ -25,10 +24,11 @@ const parseTime = (timeStr: string | undefined | null) => {
 
 export async function fetchMatches() {
   try {
-    const keyFilePath = path.join(process.cwd(), "credentials.json");
-
     const auth = new google.auth.GoogleAuth({
-      keyFile: keyFilePath,
+      credentials: {
+        client_email: process.env.GOOGLE_CLIENT_EMAIL,
+        private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      },
       scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
     });
 
