@@ -1,6 +1,7 @@
 import { HeaderSkeleton } from "@/components/skeletons/HeaderSkeleton";
 import { MatchListSkeleton } from "@/components/skeletons/MatchListSkeleton";
 import { VerdictBannerSkeleton } from "@/components/skeletons/VerdictBannerSkeleton";
+import { SeasonRecordSkeleton } from "@/components/skeletons/SeasonRecordSkeleton";
 
 export default function Loading() {
   return (
@@ -14,13 +15,20 @@ export default function Loading() {
                 <div className="h-6 w-3/4 animate-pulse bg-gray-300" />
                 <div className="mt-1 h-4 w-1/4 animate-pulse bg-gray-300 md:mt-0" />
               </div>
+
               <VerdictBannerSkeleton />
+
+              <div className="mt-4">
+                <SeasonRecordSkeleton />
+              </div>
+
               <div className="mt-2 grid grid-cols-2 gap-2 md:mt-4 md:grid-cols-4 md:gap-3">
                 <div className="h-20 animate-pulse rounded-none border border-[#1C1C1C] bg-gray-300" />
                 <div className="h-20 animate-pulse rounded-none border border-[#1C1C1C] bg-gray-300" />
                 <div className="h-20 animate-pulse rounded-none border border-[#1C1C1C] bg-gray-300" />
                 <div className="h-20 animate-pulse rounded-none border border-[#1C1C1C] bg-gray-300" />
               </div>
+
               <div className="flex gap-4">
                 <div className="mt-3 h-8 w-36 animate-pulse bg-black/80" />
                 <div className="mt-3 h-8 w-36 animate-pulse bg-black/80" />

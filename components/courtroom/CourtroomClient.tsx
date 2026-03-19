@@ -1,17 +1,19 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { MatchResult } from "@/lib/courtroom";
+import { MatchResult, CourtStats } from "@/lib/courtroom";
 import { VerdictBanner } from "@/components/courtroom/VerdictBanner";
 import { MatchList } from "@/components/courtroom/MatchList";
+import { SeasonRecord } from "@/components/stats/components/SeasonRecord";
 import { Gavel, BarChart3, Share2, BookOpen, Gamepad2 } from "lucide-react";
 import Link from "next/link";
 
 interface CourtroomClientProps {
   matches: MatchResult[];
+  stats: CourtStats;
 }
 
-export function CourtroomClient({ matches }: CourtroomClientProps) {
+export function CourtroomClient({ matches, stats }: CourtroomClientProps) {
   const lastMatchId = matches[matches.length - 1]?.id ?? 0;
   const [selectedMatchId, setSelectedMatchId] = useState(lastMatchId);
 
@@ -135,7 +137,11 @@ export function CourtroomClient({ matches }: CourtroomClientProps) {
 
                 <VerdictBanner match={selectedMatch} />
 
-                <div className="mt-2 grid grid-cols-2 gap-2 md:mt-4 md:grid-cols-4 md:gap-3">
+                <div className="mt-4">
+                  <SeasonRecord stats={stats} matches={matches} />
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-3">
                   <StatCard
                     label="Winner Time"
                     value={selectedMatch.winnerTime ? `${selectedMatch.winnerTime}s` : "N/A"}

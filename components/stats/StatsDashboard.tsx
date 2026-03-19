@@ -10,6 +10,7 @@ import { TimeDifferenceChart } from "./components/TimeDifferenceChart";
 import { VictoryCalendar } from "./components/VictoryCalendar";
 import { ResponseTimeChart } from "./components/ResponseTimeChart";
 import { PlayerProfile } from "./components/PlayerProfile";
+import { SeasonRecord } from "./components/SeasonRecord";
 
 interface StatsDashboardProps {
   matches: MatchResult[];
@@ -69,6 +70,8 @@ export function StatsDashboard({ matches, stats, rawData }: StatsDashboardProps)
       </header>
 
       <main className="container mx-auto space-y-8 px-4 py-6 md:py-8">
+        <SeasonRecord stats={stats} matches={matches} />
+
         <KpiGrid stats={stats} />
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
