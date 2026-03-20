@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { MOCK_API_DATA, processMatches } from "@/lib/courtroom";
+import { MOCK_API_DATA, processMatches, getYearFromPuzzleNo } from "@/lib/courtroom";
 import { fetchMatches } from "@/app/api/matches/route";
 import fs from "fs";
 import path from "path";
@@ -18,7 +18,8 @@ type Props = {
 
 export default async function Image({ params }: Props) {
   const { puzzleNo } = await params;
-  let rawData = await fetchMatches();
+  const targetYear = getYearFromPuzzleNo(puzzleNo);
+  let rawData = await fetchMatches(targetYear);
   if (!rawData || rawData.length === 0) {
     rawData = MOCK_API_DATA;
   }

@@ -13,7 +13,13 @@ export const size = {
 export const contentType = "image/png";
 
 export default async function Image() {
-  let rawData = await fetchMatches();
+  const currentYear = new Date().getFullYear();
+  let rawData = await fetchMatches(currentYear);
+
+  if ((!rawData || rawData.length === 0) && currentYear > 2025) {
+    rawData = await fetchMatches(currentYear - 1);
+  }
+
   if (!rawData || rawData.length === 0) {
     rawData = MOCK_API_DATA;
   }

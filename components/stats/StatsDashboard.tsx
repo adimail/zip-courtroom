@@ -1,6 +1,6 @@
 "use client";
 
-import { MatchResult, CourtStats, RawData } from "@/lib/courtroom";
+import { MatchResult, RawData } from "@/lib/courtroom";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -11,14 +11,37 @@ import { VictoryCalendar } from "./components/VictoryCalendar";
 import { ResponseTimeChart } from "./components/ResponseTimeChart";
 import { PlayerProfile } from "./components/PlayerProfile";
 import { SeasonRecord } from "./components/SeasonRecord";
+import { useMatches } from "@/hooks/useMatches";
+import { YearSelector } from "@/components/ui/YearSelector";
 
 interface StatsDashboardProps {
-  matches: MatchResult[];
-  stats: CourtStats;
-  rawData: RawData;
+  initialRawData: RawData;
+  currentYear: number;
 }
 
-export function StatsDashboard({ matches, stats, rawData }: StatsDashboardProps) {
+export function StatsDashboard({ initialRawData, currentYear }: StatsDashboardProps) {
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const { data, isLoading } = useMatches(
+    selectedYear,
+    selectedYear === currentYear ? initialRawData : undefined
+  );
+
+  const matches = data?.processedMatches || [];
+  const rawData = data?.rawData || [];
+  const stats = data?.stats || {
+    totalGames: 0,
+    adityaWins: 0,
+    mahiWins: 0,
+    draws: 0,
+    fastestTime: 0,
+    fastestPlayer: "-",
+    avgDiff: 0,
+    adityaAvgTime: 0,
+    mahiAvgTime: 0,
+    adityaFastestTime: null,
+    mahiFastestTime: null,
+  };
+
   const [hoveredMatch, setHoveredMatch] = useState<MatchResult | null>(null);
   const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
 
@@ -70,24 +93,44 @@ export function StatsDashboard({ matches, stats, rawData }: StatsDashboardProps)
       </header>
 
       <main className="container mx-auto space-y-8 px-4 py-6 md:py-8">
-        <SeasonRecord stats={stats} matches={matches} />
-
-        <KpiGrid stats={stats} />
-
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <WinDistributionChart stats={stats} />
-          <TimeDifferenceChart matches={matches} />
+        <div className="flex justify-end">
+          <YearSelector year={selectedYear} onChange={setSelectedYear} />
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <VictoryCalendar matches={matches} onDayHover={handleDayHover} />
-          <ResponseTimeChart rawData={rawData} />
-        </div>
+        {isLoading ? (
+          <div className="flex h-48 items-center justify-center border border-dashed border-[#1C1C1C] bg-transparent">
+            <p className="animate-pulse font-serif text-sm text-[#1C1C1C]">
+              Calculating statistics...
+            </p>
+          </div>
+        ) : matches.length === 0 ? (
+          <div className="flex h-48 items-center justify-center border border-dashed border-[#1C1C1C] bg-transparent">
+            <p className="font-serif text-sm text-[#1C1C1C]">
+              No data available for {selectedYear}.
+            </p>
+          </div>
+        ) : (
+          <>
+            <SeasonRecord stats={stats} matches={matches} />
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <PlayerProfile stats={stats} player="aditya" />
-          <PlayerProfile stats={stats} player="mahi" />
-        </div>
+            <KpiGrid stats={stats} />
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              <WinDistributionChart stats={stats} />
+              <TimeDifferenceChart matches={matches} />
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              <VictoryCalendar matches={matches} onDayHover={handleDayHover} />
+              <ResponseTimeChart rawData={rawData} />
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <PlayerProfile stats={stats} player="aditya" />
+              <PlayerProfile stats={stats} player="mahi" />
+            </div>
+          </>
+        )}
       </main>
     </div>
   );

@@ -11,7 +11,7 @@ export function PlayerProfile({ stats, player }: PlayerProfileProps) {
     name: isAditya ? "Aditya" : "Mahi",
     borderColor: isAditya ? "border-indigo-600" : "border-emerald-600",
     avgTime: isAditya ? stats.adityaAvgTime : stats.mahiAvgTime,
-    fastestTime: stats.fastestPlayer === player ? stats.fastestTime : "-",
+    fastestTime: isAditya ? stats.adityaFastestTime : stats.mahiFastestTime,
   };
 
   return (
@@ -29,8 +29,7 @@ export function PlayerProfile({ stats, player }: PlayerProfileProps) {
         <div className="flex justify-between border-b border-gray-300 pb-2 text-sm">
           <span className="text-xs tracking-wider text-gray-600 uppercase">Fastest Record</span>
           <span className="font-mono font-bold text-[#1C1C1C]">
-            {profile.fastestTime}
-            {profile.fastestTime !== "-" && "s"}
+            {profile.fastestTime !== null ? `${profile.fastestTime}s` : "-"}
           </span>
         </div>
       </div>

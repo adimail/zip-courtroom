@@ -1,8 +1,7 @@
 import { google } from "googleapis";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const SPREADSHEET_ID = "1YQ2xoLyN4pXqhuicquJZGWbV6x7wy8vqeCQ5FT05g_0";
-const RANGE = "Sheet1!A2:E";
 
 const parseTime = (timeStr: string | undefined | null) => {
   if (!timeStr || timeStr.trim() === "-" || timeStr.trim() === "") {
@@ -22,7 +21,17 @@ const parseTime = (timeStr: string | undefined | null) => {
   return null;
 };
 
-export async function fetchMatches() {
+export async function fetchMatches(year?: number) {
+  const currentYear = new Date().getFullYear();
+  const targetYear = year || currentYear;
+
+  if (targetYear > currentYear) {
+    throw new Error(`Cannot fetch data for future year: ${targetYear}`);
+  }
+  if (targetYear < 2025) {
+    throw new Error(`No data available before 2025`);
+  }
+
   try {
     const auth = new google.auth.GoogleAuth({
       credentials: {
@@ -33,6 +42,7 @@ export async function fetchMatches() {
     });
 
     const sheets = google.sheets({ version: "v4", auth });
+    const RANGE = `${targetYear}!A2:E`;
 
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
@@ -53,16 +63,26 @@ export async function fetchMatches() {
     }));
 
     return matchData;
-  } catch (error) {
-    console.error("Error fetching matches:", error);
+  } catch (error: any) {
+    if (error?.message?.includes("Unable to parse range")) {
+      return [];
+    }
     return null;
   }
 }
 
-export async function GET() {
-  const data = await fetchMatches();
-  if (!data) {
-    return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const yearParam = searchParams.get("year");
+  const year = yearParam ? parseInt(yearParam, 10) : new Date().getFullYear();
+
+  try {
+    const data = await fetchMatches(year);
+    if (!data) {
+      return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
+    }
+    return NextResponse.json(data);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
-  return NextResponse.json(data);
 }

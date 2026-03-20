@@ -1,25 +1,48 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { MatchResult, CourtStats } from "@/lib/courtroom";
+import { MatchResult, RawData } from "@/lib/courtroom";
 import { VerdictBanner } from "@/components/courtroom/VerdictBanner";
 import { MatchList } from "@/components/courtroom/MatchList";
 import { SeasonRecord } from "@/components/stats/components/SeasonRecord";
 import { Gavel, BarChart3, Share2, BookOpen, Gamepad2 } from "lucide-react";
 import Link from "next/link";
+import { useMatches } from "@/hooks/useMatches";
+import { YearSelector } from "@/components/ui/YearSelector";
 
 interface CourtroomClientProps {
-  matches: MatchResult[];
-  stats: CourtStats;
+  initialRawData: RawData;
+  currentYear: number;
 }
 
-export function CourtroomClient({ matches, stats }: CourtroomClientProps) {
+export function CourtroomClient({ initialRawData, currentYear }: CourtroomClientProps) {
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const { data, isLoading } = useMatches(
+    selectedYear,
+    selectedYear === currentYear ? initialRawData : undefined
+  );
+
+  const matches = data?.processedMatches || [];
+  const stats = data?.stats || {
+    totalGames: 0,
+    adityaWins: 0,
+    mahiWins: 0,
+    draws: 0,
+    fastestTime: 0,
+    fastestPlayer: "-",
+    avgDiff: 0,
+    adityaAvgTime: 0,
+    mahiAvgTime: 0,
+    adityaFastestTime: null,
+    mahiFastestTime: null,
+  };
+
   const lastMatchId = matches[matches.length - 1]?.id ?? 0;
   const [selectedMatchId, setSelectedMatchId] = useState(lastMatchId);
 
   useEffect(() => {
     setSelectedMatchId(lastMatchId);
-  }, [lastMatchId]);
+  }, [lastMatchId, selectedYear]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -109,9 +132,19 @@ export function CourtroomClient({ matches, stats }: CourtroomClientProps) {
       </header>
 
       <main className="container mx-auto px-3 py-4 md:px-4 md:py-6">
+        <div className="mb-4 flex justify-end">
+          <YearSelector year={selectedYear} onChange={setSelectedYear} />
+        </div>
+
         <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-12 lg:gap-6">
           <div className="order-1 h-fit lg:sticky lg:top-24 lg:col-span-8">
-            {selectedMatch ? (
+            {isLoading ? (
+              <div className="flex h-48 items-center justify-center border border-dashed border-[#1C1C1C] bg-transparent">
+                <p className="animate-pulse font-serif text-sm text-[#1C1C1C]">
+                  Retrieving records...
+                </p>
+              </div>
+            ) : selectedMatch ? (
               <div className="space-y-4">
                 <div className="flex flex-col justify-between border-b border-[#1C1C1C] pb-1 md:flex-row md:items-end">
                   <h2 className="font-serif text-sm font-bold text-[#1C1C1C] md:text-base">
@@ -163,7 +196,9 @@ export function CourtroomClient({ matches, stats }: CourtroomClientProps) {
               </div>
             ) : (
               <div className="flex h-48 items-center justify-center border border-dashed border-[#1C1C1C] bg-transparent">
-                <p className="font-serif text-sm text-[#1C1C1C]">No cases filed yet.</p>
+                <p className="font-serif text-sm text-[#1C1C1C]">
+                  No cases filed yet for {selectedYear}.
+                </p>
               </div>
             )}
           </div>

@@ -1,5 +1,5 @@
 import { fetchMatches } from "@/app/api/matches/route";
-import { MOCK_API_DATA, processMatches } from "@/lib/courtroom";
+import { MOCK_API_DATA, processMatches, getYearFromPuzzleNo } from "@/lib/courtroom";
 import { StandaloneVerdict } from "@/components/courtroom/StandaloneVerdict";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -12,7 +12,8 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { puzzleNo } = await params;
-  let rawData = await fetchMatches();
+  const targetYear = getYearFromPuzzleNo(puzzleNo);
+  let rawData = await fetchMatches(targetYear);
 
   if (!rawData || rawData.length === 0) {
     rawData = MOCK_API_DATA;
@@ -70,7 +71,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CasePage({ params }: Props) {
   const { puzzleNo } = await params;
-  let rawData = await fetchMatches();
+  const targetYear = getYearFromPuzzleNo(puzzleNo);
+  let rawData = await fetchMatches(targetYear);
 
   if (!rawData || rawData.length === 0) {
     rawData = MOCK_API_DATA;

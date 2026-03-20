@@ -36,6 +36,8 @@ export interface CourtStats {
   avgDiff: number;
   adityaAvgTime: number;
   mahiAvgTime: number;
+  adityaFastestTime: number | null;
+  mahiFastestTime: number | null;
 }
 
 const REFERENCE_DATE = parse("10 Nov 2025", "d MMM yyyy", new Date(2025, 10, 10));
@@ -145,6 +147,14 @@ export const DRAW_QUOTES = [
   "The clock stops precisely at the same moment. It's a tie.",
   "Judgment reserved. The times were identical. We call this a 'Zip Tie'.",
 ];
+
+export function getYearFromPuzzleNo(puzzleNo: string): number {
+  const currentPuzzle = parseInt(puzzleNo, 10);
+  if (isNaN(currentPuzzle)) return new Date().getFullYear();
+  const dayDifference = currentPuzzle - REFERENCE_PUZZLE;
+  const targetDate = addDays(REFERENCE_DATE, dayDifference);
+  return targetDate.getFullYear();
+}
 
 export function getDeterministicVerdict<T>(caseId: string, winnerId: string, verdicts: T[]): T {
   if (!verdicts?.length) {
@@ -390,6 +400,8 @@ export function calculateStats(matches: MatchResult[], rawData: RawData): CourtS
       avgDiff: 0,
       adityaAvgTime: 0,
       mahiAvgTime: 0,
+      adityaFastestTime: null,
+      mahiFastestTime: null,
     };
   }
 
@@ -421,15 +433,23 @@ export function calculateStats(matches: MatchResult[], rawData: RawData): CourtS
   let adityaCount = 0;
   let mahiTotalTime = 0;
   let mahiCount = 0;
+  let adityaFastestTime: number | null = null;
+  let mahiFastestTime: number | null = null;
 
   for (const match of rawData) {
     if (match.aditya !== null) {
       adityaTotalTime += match.aditya;
       adityaCount++;
+      if (adityaFastestTime === null || match.aditya < adityaFastestTime) {
+        adityaFastestTime = match.aditya;
+      }
     }
     if (match.mahi !== null) {
       mahiTotalTime += match.mahi;
       mahiCount++;
+      if (mahiFastestTime === null || match.mahi < mahiFastestTime) {
+        mahiFastestTime = match.mahi;
+      }
     }
   }
 
@@ -443,6 +463,8 @@ export function calculateStats(matches: MatchResult[], rawData: RawData): CourtS
     avgDiff: diffCount > 0 ? parseFloat((totalDiff / diffCount).toFixed(2)) : 0,
     adityaAvgTime: adityaCount > 0 ? parseFloat((adityaTotalTime / adityaCount).toFixed(2)) : 0,
     mahiAvgTime: mahiCount > 0 ? parseFloat((mahiTotalTime / mahiCount).toFixed(2)) : 0,
+    adityaFastestTime,
+    mahiFastestTime,
   };
 }
 
