@@ -45,11 +45,9 @@ export default async function Image() {
 
   const primaryQuote = latestMatch.quotes[0];
   const secondaryQuote = latestMatch.quotes[1] || "Justice served.";
-
   const serifFontData = fs.readFileSync(
     path.join(process.cwd(), "public/fonts/PlayfairDisplay-Bold.ttf")
   );
-
   const sansFontData = fs.readFileSync(path.join(process.cwd(), "public/fonts/Inter-Regular.ttf"));
 
   const getVerdictChar = () => {
@@ -58,12 +56,8 @@ export default async function Image() {
         return "A";
       case "mahi":
         return "M";
-      case "tie":
-        return "T";
-      case "draw":
-        return "D";
       default:
-        return "?";
+        return "D";
     }
   };
 
@@ -105,7 +99,6 @@ export default async function Image() {
           <path d="M6 6h12" />
           <path d="M6 18h12" />
         </svg>
-
         <div
           style={{
             display: "flex",
@@ -120,12 +113,7 @@ export default async function Image() {
           }}
         >
           <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "10px",
-            }}
+            style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}
           >
             <svg
               width="48"
@@ -143,15 +131,7 @@ export default async function Image() {
               <path d="m9 7 8 8" />
               <path d="m21 11-8-8" />
             </svg>
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "15px",
-                marginTop: "10px",
-              }}
-            >
+            <div style={{ display: "flex", alignItems: "center", gap: "15px", marginTop: "10px" }}>
               <div
                 style={{ display: "flex", width: "40px", height: "1px", background: "#D97706" }}
               />
@@ -173,7 +153,6 @@ export default async function Image() {
               />
             </div>
           </div>
-
           <div
             style={{
               display: "flex",
@@ -195,7 +174,6 @@ export default async function Image() {
             >
               {primaryQuote}
             </div>
-
             <div
               style={{
                 display: "flex",
@@ -205,7 +183,6 @@ export default async function Image() {
                 margin: "20px 0",
               }}
             />
-
             <div
               style={{
                 display: "flex",
@@ -220,7 +197,6 @@ export default async function Image() {
               &quot;{secondaryQuote}&quot;
             </div>
           </div>
-
           <div
             style={{
               display: "flex",
@@ -256,7 +232,6 @@ export default async function Image() {
               {latestMatch.date}
             </div>
           </div>
-
           <div
             style={{
               position: "absolute",
@@ -305,18 +280,8 @@ export default async function Image() {
     {
       ...size,
       fonts: [
-        {
-          name: "Playfair Display",
-          data: serifFontData,
-          style: "normal",
-          weight: 700,
-        },
-        {
-          name: "Inter",
-          data: sansFontData,
-          style: "normal",
-          weight: 400,
-        },
+        { name: "Playfair Display", data: serifFontData, style: "normal", weight: 700 },
+        { name: "Inter", data: sansFontData, style: "normal", weight: 400 },
       ],
     }
   );

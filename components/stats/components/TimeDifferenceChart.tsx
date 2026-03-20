@@ -20,7 +20,7 @@ interface TimeDifferenceChartProps {
 
 export function TimeDifferenceChart({ matches }: TimeDifferenceChartProps) {
   const diffData = matches
-    .filter((m) => m.winner !== "tie" && m.winner !== "draw" && m.diff >= 0)
+    .filter((m) => m.winner !== "draw" && m.diff >= 0)
     .map((m) => ({
       name: m.puzzleNo,
       difference: m.diff,

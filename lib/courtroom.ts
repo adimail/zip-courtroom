@@ -1,6 +1,6 @@
 import { format, parse, addDays } from "date-fns";
 
-export type Player = "aditya" | "mahi" | "tie" | "draw";
+export type Player = "aditya" | "mahi" | "draw";
 
 export interface RawMatch {
   puzzleNo: string;
@@ -30,7 +30,6 @@ export interface CourtStats {
   totalGames: number;
   adityaWins: number;
   mahiWins: number;
-  ties: number;
   draws: number;
   fastestTime: number;
   fastestPlayer: string;
@@ -136,24 +135,17 @@ export const PRIZE_QUOTES = [
   "Damages awarded to the plaintiff: {prize}.",
 ];
 
-export const TIE_QUOTES = [
-  "A perfect deadlock. The court rules this case a tie. Neither party gains the upper hand.",
-  "Unprecedented speed synchronization. Case dismissed due to equal performance.",
-  "The clock stops precisely at the same moment. It's a tie.",
-  "Judgment reserved. The times were identical. We call this a 'Zip Tie'.",
-];
-
 export const DRAW_QUOTES = [
   "Mistrial declared. Both parties failed to appear in court.",
   "Case dismissed. No valid submissions were entered into the record.",
   "The courtroom is empty. Both contestants were absent, resulting in a draw.",
   "A double forfeit. The case is declared a draw due to non-appearance.",
+  "A perfect deadlock. The court rules this case a draw. Neither party gains the hand.",
+  "Unprecedented speed synchronization. Case dismissed due to equal performance.",
+  "The clock stops precisely at the same moment. It's a tie.",
+  "Judgment reserved. The times were identical. We call this a 'Zip Tie'.",
 ];
 
-/**
- * Generates a deterministic hash-based index for selecting quotes
- * Ensures the same match always gets the same quote
- */
 export function getDeterministicVerdict<T>(caseId: string, winnerId: string, verdicts: T[]): T {
   if (!verdicts?.length) {
     throw new Error("The verdicts array cannot be empty.");
@@ -172,9 +164,6 @@ export function getDeterministicVerdict<T>(caseId: string, winnerId: string, ver
   return verdicts[index];
 }
 
-/**
- * Calculates the date for a given puzzle number based on reference point
- */
 function calculateDate(puzzleNo: string): string {
   const currentPuzzle = parseInt(puzzleNo, 10);
   if (isNaN(currentPuzzle)) return "Unknown Date";
@@ -185,9 +174,6 @@ function calculateDate(puzzleNo: string): string {
   return format(targetDate, "d MMM yyyy");
 }
 
-/**
- * Determines match outcome and calculates statistics
- */
 function determineMatchOutcome(tAditya: number | null, tMahi: number | null) {
   let winner: Player = "draw";
   let loser: Player = "draw";
@@ -195,12 +181,10 @@ function determineMatchOutcome(tAditya: number | null, tMahi: number | null) {
   let loserTime: number | null = null;
   let diff = 0;
 
-  // Both players absent
-  if (tAditya === null && tMahi === null) {
-    return { winner, loser, winnerTime, loserTime, diff };
+  if (tAditya === tMahi) {
+    return { winner, loser, winnerTime: tAditya, loserTime: tMahi, diff: 0 };
   }
 
-  // Mahi wins by default
   if (tAditya === null) {
     return {
       winner: "mahi" as Player,
@@ -211,7 +195,6 @@ function determineMatchOutcome(tAditya: number | null, tMahi: number | null) {
     };
   }
 
-  // Aditya wins by default
   if (tMahi === null) {
     return {
       winner: "aditya" as Player,
@@ -222,34 +205,22 @@ function determineMatchOutcome(tAditya: number | null, tMahi: number | null) {
     };
   }
 
-  // Both players present - determine winner
-  if (tAditya === tMahi) {
-    winner = "tie";
-    loser = "tie";
-    winnerTime = tAditya;
-    loserTime = tMahi;
-    diff = 0;
-  } else {
-    const isAdityaWinner = tAditya < tMahi;
-    winner = isAdityaWinner ? "aditya" : "mahi";
-    loser = isAdityaWinner ? "mahi" : "aditya";
-    winnerTime = Math.min(tAditya, tMahi);
-    loserTime = Math.max(tAditya, tMahi);
-    diff = loserTime - winnerTime;
-  }
+  const isAdityaWinner = tAditya < tMahi;
+  winner = isAdityaWinner ? "aditya" : "mahi";
+  loser = isAdityaWinner ? "mahi" : "aditya";
+  winnerTime = Math.min(tAditya, tMahi);
+  loserTime = Math.max(tAditya, tMahi);
+  diff = loserTime - winnerTime;
 
   return { winner, loser, winnerTime, loserTime, diff };
 }
 
-/**
- * Updates streak tracking based on current match result
- */
 function updateStreak(
   winner: Player,
   currentStreakWinner: Player | null,
   currentStreak: number
 ): { newStreak: number; newStreakWinner: Player | null } {
-  if (winner === "tie" || winner === "draw") {
+  if (winner === "draw") {
     return { newStreak: 0, newStreakWinner: null };
   }
 
@@ -260,9 +231,6 @@ function updateStreak(
   return { newStreak: 1, newStreakWinner: winner };
 }
 
-/**
- * Replaces placeholders in quote templates with actual values
- */
 function fillQuoteTemplate(
   quote: string,
   winnerName: string,
@@ -281,9 +249,6 @@ function fillQuoteTemplate(
     .replaceAll("{prize}", prize ?? "");
 }
 
-/**
- * Generates contextual quotes based on match outcome and stats
- */
 export function generateQuotes(
   winner: Player,
   loser: Player,
@@ -296,14 +261,9 @@ export function generateQuotes(
 ): string[] {
   if (winner === "draw") {
     const quote = getDeterministicVerdict(puzzleNo, "draw", DRAW_QUOTES);
-    return [quote, "The court awaits their next appearance."];
-  }
-
-  if (winner === "tie") {
-    const quote = getDeterministicVerdict(puzzleNo, "tie", TIE_QUOTES);
     return [
-      `${quote} Final time: ${winnerTime?.toFixed(2) ?? 0}s.`,
-      "The court's decision is final: stalemate.",
+      quote,
+      winnerTime ? `Final time: ${winnerTime.toFixed(2)}s.` : "The court awaits their appearance.",
     ];
   }
 
@@ -361,9 +321,6 @@ export function generateQuotes(
   return quotes;
 }
 
-/**
- * Processes raw match data into enriched match results with quotes and stats
- */
 export function processMatches(data: RawData): MatchResult[] {
   if (!data?.length) return [];
 
@@ -376,25 +333,21 @@ export function processMatches(data: RawData): MatchResult[] {
     const match = data[index];
     const date = calculateDate(match.puzzleNo);
 
-    // Determine match outcome
     const { winner, loser, winnerTime, loserTime, diff } = determineMatchOutcome(
       match.aditya,
       match.mahi
     );
 
-    // Update streak tracking
     const { newStreak, newStreakWinner } = updateStreak(winner, currentStreakWinner, currentStreak);
     currentStreak = newStreak;
     currentStreakWinner = newStreakWinner;
 
-    // Check for new record
     let isNewRecord = false;
     if (winnerTime !== null && winnerTime < globalFastestTime) {
       globalFastestTime = winnerTime;
       isNewRecord = true;
     }
 
-    // Generate quotes
     const quotes = generateQuotes(
       winner,
       loser,
@@ -425,16 +378,12 @@ export function processMatches(data: RawData): MatchResult[] {
   return matches;
 }
 
-/**
- * Calculates aggregate statistics across all matches
- */
 export function calculateStats(matches: MatchResult[], rawData: RawData): CourtStats {
   if (!matches?.length) {
     return {
       totalGames: 0,
       adityaWins: 0,
       mahiWins: 0,
-      ties: 0,
       draws: 0,
       fastestTime: 0,
       fastestPlayer: "-",
@@ -446,35 +395,28 @@ export function calculateStats(matches: MatchResult[], rawData: RawData): CourtS
 
   let adityaWins = 0;
   let mahiWins = 0;
-  let ties = 0;
   let draws = 0;
   let fastestTime = Infinity;
   let fastestPlayer = "-";
   let totalDiff = 0;
   let diffCount = 0;
 
-  // Process match results
   for (const match of matches) {
-    // Count wins
     if (match.winner === "aditya") adityaWins++;
     else if (match.winner === "mahi") mahiWins++;
-    else if (match.winner === "tie") ties++;
-    else if (match.winner === "draw") draws++;
+    else draws++;
 
-    // Track fastest time
     if (match.winnerTime !== null && match.winnerTime < fastestTime) {
       fastestTime = match.winnerTime;
       fastestPlayer = match.winner;
     }
 
-    // Accumulate differences (excluding defaults)
-    if (match.diff >= 0) {
+    if (match.diff >= 0 && match.winner !== "draw") {
       totalDiff += match.diff;
       diffCount++;
     }
   }
 
-  // Calculate average times per player
   let adityaTotalTime = 0;
   let adityaCount = 0;
   let mahiTotalTime = 0;
@@ -495,7 +437,6 @@ export function calculateStats(matches: MatchResult[], rawData: RawData): CourtS
     totalGames: matches.length,
     adityaWins,
     mahiWins,
-    ties,
     draws,
     fastestTime: fastestTime === Infinity ? 0 : fastestTime,
     fastestPlayer: fastestPlayer === "-" ? "-" : fastestPlayer,
@@ -504,10 +445,6 @@ export function calculateStats(matches: MatchResult[], rawData: RawData): CourtS
     mahiAvgTime: mahiCount > 0 ? parseFloat((mahiTotalTime / mahiCount).toFixed(2)) : 0,
   };
 }
-
-// ============================================================================
-// MOCK DATA
-// ============================================================================
 
 export const MOCK_API_DATA: RawData = [
   { puzzleNo: "238", aditya: 8, mahi: 15, prize: null },

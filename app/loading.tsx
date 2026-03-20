@@ -18,10 +18,6 @@ export default function Loading() {
 
               <VerdictBannerSkeleton />
 
-              <div className="mt-4">
-                <SeasonRecordSkeleton />
-              </div>
-
               <div className="mt-2 grid grid-cols-2 gap-2 md:mt-4 md:grid-cols-4 md:gap-3">
                 <div className="h-20 animate-pulse rounded-none border border-[#1C1C1C] bg-gray-300" />
                 <div className="h-20 animate-pulse rounded-none border border-[#1C1C1C] bg-gray-300" />
@@ -33,6 +29,10 @@ export default function Loading() {
                 <div className="mt-3 h-8 w-36 animate-pulse bg-black/80" />
                 <div className="mt-3 h-8 w-36 animate-pulse bg-black/80" />
               </div>
+            </div>
+
+            <div className="mt-4">
+              <SeasonRecordSkeleton />
             </div>
           </div>
           <div className="order-2 lg:col-span-4">

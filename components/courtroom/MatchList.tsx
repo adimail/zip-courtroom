@@ -69,9 +69,9 @@ export function MatchList({ matches, selectedMatchId, onSelectMatch }: MatchList
                           : "text-slate-500"
                   )}
                 />
-                {match.winner === "tie" || match.winner === "draw" ? (
+                {match.winner === "draw" ? (
                   <span className="font-serif text-sm font-bold text-slate-500 uppercase">
-                    {match.winner}
+                    DRAW
                   </span>
                 ) : (
                   <>

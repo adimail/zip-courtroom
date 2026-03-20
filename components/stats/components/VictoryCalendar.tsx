@@ -18,7 +18,6 @@ export function VictoryCalendar({ matches, onDayHover }: VictoryCalendarProps) {
 
   const adityaDays: Date[] = [];
   const mahiDays: Date[] = [];
-  const tieDays: Date[] = [];
   const drawDays: Date[] = [];
   const dateToMatchMap = new Map<string, MatchResult>();
 
@@ -30,8 +29,7 @@ export function VictoryCalendar({ matches, onDayHover }: VictoryCalendarProps) {
 
       if (match.winner === "aditya") adityaDays.push(parsedDate);
       else if (match.winner === "mahi") mahiDays.push(parsedDate);
-      else if (match.winner === "tie") tieDays.push(parsedDate);
-      else if (match.winner === "draw") drawDays.push(parsedDate);
+      else drawDays.push(parsedDate);
     } catch (error) {
       console.error("Error parsing date for calendar:", match.date);
     }
@@ -81,7 +79,6 @@ export function VictoryCalendar({ matches, onDayHover }: VictoryCalendarProps) {
           modifiers={{
             aditya: adityaDays,
             mahi: mahiDays,
-            tie: tieDays,
             draw: drawDays,
             hasMatch: (date) => dateToMatchMap.has(format(date, "yyyy-MM-dd")),
           }}
@@ -101,14 +98,8 @@ export function VictoryCalendar({ matches, onDayHover }: VictoryCalendarProps) {
               fontWeight: "bold",
               border: "1px solid #1C1C1C",
             },
-            tie: {
-              backgroundColor: "#94a3b8",
-              color: "white",
-              fontWeight: "bold",
-              border: "1px solid #1C1C1C",
-            },
             draw: {
-              backgroundColor: "#6b7280",
+              backgroundColor: "#94a3b8",
               color: "white",
               fontWeight: "bold",
               border: "1px solid #1C1C1C",
@@ -129,10 +120,6 @@ export function VictoryCalendar({ matches, onDayHover }: VictoryCalendarProps) {
           </div>
           <div className="flex items-center gap-2">
             <div className="h-3 w-3 border border-[#1C1C1C] bg-slate-400"></div>
-            <span>Tie</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="h-3 w-3 border border-[#1C1C1C] bg-gray-600"></div>
             <span>Draw</span>
           </div>
         </div>

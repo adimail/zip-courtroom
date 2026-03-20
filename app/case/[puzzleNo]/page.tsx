@@ -33,14 +33,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     case "mahi":
       winnerDisplay = `${match.winner.toUpperCase()} Wins`;
       break;
-    case "tie":
-      winnerDisplay = "TIE";
-      break;
-    case "draw":
-      winnerDisplay = "DRAW";
-      break;
     default:
-      winnerDisplay = "VERDICT";
+      winnerDisplay = "DRAW";
   }
 
   const title = `Verdict: Case #${match.puzzleNo} | ${winnerDisplay}`;
@@ -51,14 +45,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     case "mahi":
       description = `Official Judicial Record. Winner: ${match.winner} (${match.winnerTime}s). Loser: ${match.loser}. See the full verdict.`;
       break;
-    case "tie":
-      description = `Official Judicial Record: Case resulted in a Tie at ${match.winnerTime}s.`;
-      break;
-    case "draw":
-      description = `Official Judicial Record: Case resulted in a Draw as both parties were absent.`;
-      break;
     default:
-      description = "Official Judicial Record for Zip Courtroom.";
+      description = `Official Judicial Record: Case resulted in a Draw.`;
   }
 
   return {

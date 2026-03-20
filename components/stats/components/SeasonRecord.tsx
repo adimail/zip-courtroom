@@ -12,11 +12,11 @@ export function SeasonRecord({ stats, matches }: SeasonRecordProps) {
   const totalCases = stats.totalGames;
   const adityaWins = stats.adityaWins;
   const mahiWins = stats.mahiWins;
-  const ties = stats.ties + stats.draws;
+  const draws = stats.draws;
 
   const adityaPct = totalCases > 0 ? Math.round((adityaWins / totalCases) * 100) : 0;
   const mahiPct = totalCases > 0 ? Math.round((mahiWins / totalCases) * 100) : 0;
-  const tiesPct = totalCases > 0 ? Math.round((ties / totalCases) * 100) : 0;
+  const drawsPct = totalCases > 0 ? Math.round((draws / totalCases) * 100) : 0;
 
   const recentMatches = matches.slice(-7);
 
@@ -41,9 +41,6 @@ export function SeasonRecord({ stats, matches }: SeasonRecordProps) {
               <h3 className="truncate text-xs font-bold text-white sm:text-base md:text-xl">
                 Aditya
               </h3>
-              <p className="truncate text-[9px] text-[#A3A3A3] sm:text-xs md:text-sm">
-                The Director
-              </p>
             </div>
           </div>
 
@@ -59,7 +56,7 @@ export function SeasonRecord({ stats, matches }: SeasonRecordProps) {
                     "h-1.5 w-1.5 rounded-sm sm:h-2 sm:w-2 md:h-2.5 md:w-2.5",
                     match.winner === "aditya" && "bg-[#4f46e5]",
                     match.winner === "mahi" && "bg-[#10b981]",
-                    (match.winner === "tie" || match.winner === "draw") && "bg-[#94a3b8]"
+                    match.winner === "draw" && "bg-[#94a3b8]"
                   )}
                 />
               ))}
@@ -74,9 +71,6 @@ export function SeasonRecord({ stats, matches }: SeasonRecordProps) {
               <h3 className="truncate text-xs font-bold text-white sm:text-base md:text-xl">
                 Mahi
               </h3>
-              <p className="truncate text-[9px] text-[#A3A3A3] sm:text-xs md:text-sm">
-                The Documentation Head
-              </p>
             </div>
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-[#10b981]/20 text-[10px] font-bold text-[#34d399] sm:h-10 sm:w-10 sm:text-sm md:h-12 md:w-12 md:text-lg">
               MH
@@ -86,7 +80,7 @@ export function SeasonRecord({ stats, matches }: SeasonRecordProps) {
 
         <div className="mt-5 mb-2.5 flex h-1.5 w-full overflow-hidden rounded-sm bg-[#404040] sm:mt-6 sm:mb-3 sm:h-2 md:h-2.5">
           <div className="bg-[#4f46e5]" style={{ width: `${adityaPct}%` }} />
-          <div className="bg-[#94a3b8]" style={{ width: `${tiesPct}%` }} />
+          <div className="bg-[#94a3b8]" style={{ width: `${drawsPct}%` }} />
           <div className="bg-[#10b981]" style={{ width: `${mahiPct}%` }} />
         </div>
 
@@ -95,7 +89,7 @@ export function SeasonRecord({ stats, matches }: SeasonRecordProps) {
             <span className="text-[#818cf8]">{adityaWins} wins</span>
             <span className="text-[#A3A3A3]"> · {adityaPct}%</span>
           </div>
-          <div className="font-mono text-[#A3A3A3]">{ties} ties</div>
+          <div className="font-mono text-[#A3A3A3]">{draws} draws</div>
           <div className="text-right font-bold">
             <span className="text-[#34d399]">{mahiWins} wins</span>
             <span className="text-[#A3A3A3]"> · {mahiPct}%</span>

@@ -19,7 +19,7 @@ export function KpiGrid({ stats }: KpiGridProps) {
         value={stats.adityaWins.toString()}
         subValue={`${
           stats.totalGames > 0
-            ? ((stats.adityaWins / (stats.totalGames - stats.draws - stats.ties)) * 100).toFixed(0)
+            ? ((stats.adityaWins / (stats.totalGames - stats.draws)) * 100).toFixed(0)
             : 0
         }%`}
         icon={<Trophy className="h-5 w-5 text-indigo-600" />}
@@ -30,21 +30,25 @@ export function KpiGrid({ stats }: KpiGridProps) {
         value={stats.mahiWins.toString()}
         subValue={`${
           stats.totalGames > 0
-            ? ((stats.mahiWins / (stats.totalGames - stats.draws - stats.ties)) * 100).toFixed(0)
+            ? ((stats.mahiWins / (stats.totalGames - stats.draws)) * 100).toFixed(0)
             : 0
         }%`}
         icon={<Trophy className="h-5 w-5 text-emerald-600" />}
         highlight="emerald"
       />
       <KpiCard
-        title="Ties / Draws"
-        value={`${stats.ties} / ${stats.draws}`}
+        title="Total Draws"
+        value={stats.draws.toString()}
         icon={<Scale className="h-5 w-5 text-gray-600" />}
       />
       <KpiCard
         title="Fastest Time"
         value={`${stats.fastestTime}s`}
-        subValue={stats.fastestPlayer.charAt(0).toUpperCase() + stats.fastestPlayer.slice(1)}
+        subValue={
+          stats.fastestPlayer !== "-"
+            ? stats.fastestPlayer.charAt(0).toUpperCase() + stats.fastestPlayer.slice(1)
+            : "-"
+        }
         icon={<Zap className="h-5 w-5 text-amber-600" />}
       />
       <KpiCard

@@ -37,7 +37,6 @@ export function CourtroomClient({ matches, stats }: CourtroomClientProps) {
         });
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [matches.length]);
@@ -46,18 +45,12 @@ export function CourtroomClient({ matches, stats }: CourtroomClientProps) {
 
   const handleShare = useCallback(async () => {
     if (typeof window === "undefined" || !selectedMatch) return;
-
     const url = `${window.location.origin}/case/${selectedMatch.puzzleNo}`;
     const title = `Case #${selectedMatch.puzzleNo}: ${selectedMatch.winner.toUpperCase()} vs ${selectedMatch.loser.toUpperCase()}`;
     const text = `Official Verdict for Case #${selectedMatch.puzzleNo}.\nWinner: ${selectedMatch.winner.toUpperCase()} (${selectedMatch.winnerTime}s)\n\nRead the full judgment here:`;
-
     if (navigator.share) {
       try {
-        await navigator.share({
-          title,
-          text,
-          url,
-        });
+        await navigator.share({ title, text, url });
       } catch (error) {
         console.log("Error sharing:", error);
       }
@@ -73,15 +66,10 @@ export function CourtroomClient({ matches, stats }: CourtroomClientProps) {
       case "aditya":
       case "mahi":
         return `CASE #${match.puzzleNo}: ${match.winner.toUpperCase()} v. ${match.loser.toUpperCase()}`;
-      case "tie":
-        return `CASE #${match.puzzleNo}: TIE`;
-      case "draw":
-        return `CASE #${match.puzzleNo}: DRAW`;
       default:
-        return `CASE #${match.puzzleNo}`;
+        return `CASE #${match.puzzleNo}: DRAW`;
     }
   };
-  const matchTitle = getMatchTitle(selectedMatch);
 
   return (
     <div className="min-h-screen bg-[#EBE8E1] pb-8 font-sans text-[#1C1C1C]">
@@ -101,7 +89,6 @@ export function CourtroomClient({ matches, stats }: CourtroomClientProps) {
               </p>
             </div>
           </div>
-
           <div className="flex items-center gap-2">
             <Link
               href="/game"
@@ -128,19 +115,13 @@ export function CourtroomClient({ matches, stats }: CourtroomClientProps) {
               <div className="space-y-4">
                 <div className="flex flex-col justify-between border-b border-[#1C1C1C] pb-1 md:flex-row md:items-end">
                   <h2 className="font-serif text-sm font-bold text-[#1C1C1C] md:text-base">
-                    {matchTitle}
+                    {getMatchTitle(selectedMatch)}
                   </h2>
                   <span className="font-mono text-[10px] font-bold text-slate-600 uppercase md:text-xs">
                     {selectedMatch.date}
                   </span>
                 </div>
-
                 <VerdictBanner match={selectedMatch} />
-
-                <div className="mt-4">
-                  <SeasonRecord stats={stats} matches={matches} />
-                </div>
-
                 <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-3">
                   <StatCard
                     label="Winner Time"
@@ -160,7 +141,6 @@ export function CourtroomClient({ matches, stats }: CourtroomClientProps) {
                     highlighted={selectedMatch.streak >= 2}
                   />
                 </div>
-
                 <div className="mt-3 flex items-center gap-2">
                   <button
                     onClick={handleShare}
@@ -177,6 +157,9 @@ export function CourtroomClient({ matches, stats }: CourtroomClientProps) {
                     Open Verdict
                   </Link>
                 </div>
+                <div className="mt-4">
+                  <SeasonRecord stats={stats} matches={matches} />
+                </div>
               </div>
             ) : (
               <div className="flex h-48 items-center justify-center border border-dashed border-[#1C1C1C] bg-transparent">
@@ -184,16 +167,13 @@ export function CourtroomClient({ matches, stats }: CourtroomClientProps) {
               </div>
             )}
           </div>
-
           <div className="order-2 lg:col-span-4">
             <MatchList
               matches={matches}
               selectedMatchId={selectedMatchId}
               onSelectMatch={(id) => {
                 setSelectedMatchId(id);
-                if (window.innerWidth < 1024) {
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }
+                if (window.innerWidth < 1024) window.scrollTo({ top: 0, behavior: "smooth" });
               }}
             />
           </div>
@@ -214,17 +194,13 @@ function StatCard({
 }) {
   return (
     <div
-      className={`border p-2 ${
-        highlighted ? "border-amber-600 bg-amber-100" : "border-[#1C1C1C] bg-[#F5F4F0]"
-      }`}
+      className={`border p-2 ${highlighted ? "border-amber-600 bg-amber-100" : "border-[#1C1C1C] bg-[#F5F4F0]"}`}
     >
       <div className="mb-1 border-b border-slate-300 pb-0.5 text-[9px] font-bold tracking-widest text-slate-500 uppercase">
         {label}
       </div>
       <div
-        className={`font-mono text-lg font-bold md:text-xl ${
-          highlighted ? "text-amber-700" : "text-[#1C1C1C]"
-        }`}
+        className={`font-mono text-lg font-bold md:text-xl ${highlighted ? "text-amber-700" : "text-[#1C1C1C]"}`}
       >
         {value}
       </div>
