@@ -23,19 +23,6 @@ export function CourtroomClient({ initialRawData, currentYear }: CourtroomClient
   );
 
   const matches = data?.processedMatches || [];
-  const stats = data?.stats || {
-    totalGames: 0,
-    adityaWins: 0,
-    mahiWins: 0,
-    draws: 0,
-    fastestTime: 0,
-    fastestPlayer: "-",
-    avgDiff: 0,
-    adityaAvgTime: 0,
-    mahiAvgTime: 0,
-    adityaFastestTime: null,
-    mahiFastestTime: null,
-  };
 
   const lastMatchId = matches[matches.length - 1]?.id ?? 0;
   const [selectedMatchId, setSelectedMatchId] = useState(lastMatchId);
@@ -186,7 +173,7 @@ export function CourtroomClient({ initialRawData, currentYear }: CourtroomClient
                   </Link>
                 </div>
                 <div className="mt-4">
-                  <SeasonRecord stats={stats} matches={matches} />
+                  <SeasonRecord matches={matches} />
                 </div>
               </div>
             ) : (

@@ -111,7 +111,7 @@ export function StatsDashboard({ initialRawData, currentYear }: StatsDashboardPr
           </div>
         ) : (
           <>
-            <SeasonRecord stats={stats} matches={matches} />
+            <SeasonRecord matches={matches} />
 
             <KpiGrid stats={stats} />
 

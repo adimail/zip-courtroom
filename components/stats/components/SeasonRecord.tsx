@@ -1,33 +1,32 @@
 "use client";
 
-import { CourtStats, MatchResult } from "@/lib/courtroom";
+import { MatchResult } from "@/lib/courtroom";
 import { cn } from "@/lib/utils";
 
 interface SeasonRecordProps {
-  stats: CourtStats;
   matches: MatchResult[];
 }
 
-export function SeasonRecord({ stats, matches }: SeasonRecordProps) {
-  const totalCases = stats.totalGames;
-  const adityaWins = stats.adityaWins;
-  const mahiWins = stats.mahiWins;
-  const draws = stats.draws;
+export function SeasonRecord({ matches }: SeasonRecordProps) {
+  const recentMatches = matches.slice(-7);
+  const totalCases = recentMatches.length;
+
+  const adityaWins = recentMatches.filter((m) => m.winner === "aditya").length;
+  const mahiWins = recentMatches.filter((m) => m.winner === "mahi").length;
+  const draws = recentMatches.filter((m) => m.winner === "draw").length;
 
   const adityaPct = totalCases > 0 ? Math.round((adityaWins / totalCases) * 100) : 0;
   const mahiPct = totalCases > 0 ? Math.round((mahiWins / totalCases) * 100) : 0;
   const drawsPct = totalCases > 0 ? Math.round((draws / totalCases) * 100) : 0;
 
-  const recentMatches = matches.slice(-7);
-
   return (
     <div className="w-full">
       <div className="mb-2 flex items-end justify-between text-[#1C1C1C] sm:mb-3">
         <span className="font-serif text-[11px] font-bold tracking-[0.15em] uppercase sm:text-sm md:text-base">
-          Season Record
+          Recent Form (Last 7 Days)
         </span>
         <span className="text-[9px] tracking-wider text-gray-600 uppercase sm:text-xs md:text-sm">
-          {totalCases} cases filed
+          {totalCases} cases analyzed
         </span>
       </div>
 
