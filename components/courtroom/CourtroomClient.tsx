@@ -74,9 +74,7 @@ export function CourtroomClient({ initialRawData, currentYear }: CourtroomClient
     if (navigator.share) {
       try {
         await navigator.share({ title, text, url });
-      } catch (error) {
-        console.log("Error sharing:", error);
-      }
+      } catch (error) {}
     } else {
       navigator.clipboard.writeText(url);
       alert("Link copied to clipboard!");
@@ -132,10 +130,6 @@ export function CourtroomClient({ initialRawData, currentYear }: CourtroomClient
       </header>
 
       <main className="container mx-auto px-3 py-4 md:px-4 md:py-6">
-        <div className="mb-4 flex justify-end">
-          <YearSelector year={selectedYear} onChange={setSelectedYear} />
-        </div>
-
         <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-12 lg:gap-6">
           <div className="order-1 h-fit lg:sticky lg:top-24 lg:col-span-8">
             {isLoading ? (
@@ -159,6 +153,7 @@ export function CourtroomClient({ initialRawData, currentYear }: CourtroomClient
                   <StatCard
                     label="Winner Time"
                     value={selectedMatch.winnerTime ? `${selectedMatch.winnerTime}s` : "N/A"}
+                    emoji="🎀"
                   />
                   <StatCard
                     label="Loser Time"
@@ -203,6 +198,10 @@ export function CourtroomClient({ initialRawData, currentYear }: CourtroomClient
             )}
           </div>
           <div className="order-2 lg:col-span-4">
+            <div className="mt-8 mb-4 flex justify-end md:mt-0">
+              <YearSelector year={selectedYear} onChange={setSelectedYear} />
+            </div>
+
             <MatchList
               matches={matches}
               selectedMatchId={selectedMatchId}
@@ -222,15 +221,22 @@ function StatCard({
   label,
   value,
   highlighted,
+  emoji,
 }: {
   label: string;
   value: string;
   highlighted?: boolean;
+  emoji?: string;
 }) {
   return (
     <div
-      className={`border p-2 ${highlighted ? "border-amber-600 bg-amber-100" : "border-[#1C1C1C] bg-[#F5F4F0]"}`}
+      className={`relative border p-2 ${highlighted ? "border-amber-600 bg-amber-100" : "border-[#1C1C1C] bg-[#F5F4F0]"}`}
     >
+      {emoji && (
+        <div className="absolute -top-3 -right-3 z-10 rotate-[25deg] text-xl leading-none drop-shadow-sm select-none md:-top-3.5 md:-right-3.5 md:text-2xl">
+          {emoji}
+        </div>
+      )}
       <div className="mb-1 border-b border-slate-300 pb-0.5 text-[9px] font-bold tracking-widest text-slate-500 uppercase">
         {label}
       </div>
