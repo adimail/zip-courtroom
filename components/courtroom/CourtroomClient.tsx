@@ -9,6 +9,8 @@ import { Gavel, BarChart3, Share2, BookOpen, Gamepad2 } from "lucide-react";
 import Link from "next/link";
 import { useMatches } from "@/hooks/useMatches";
 import { YearSelector } from "@/components/ui/YearSelector";
+import { ThingsToDo } from "@/components/easteregg/ThingsToDo";
+import { motion, AnimatePresence } from "motion/react";
 
 interface CourtroomClientProps {
   initialRawData: RawData;
@@ -17,13 +19,13 @@ interface CourtroomClientProps {
 
 export function CourtroomClient({ initialRawData, currentYear }: CourtroomClientProps) {
   const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [showSecret, setShowSecret] = useState(false);
   const { data, isLoading } = useMatches(
     selectedYear,
     selectedYear === currentYear ? initialRawData : undefined
   );
 
   const matches = data?.processedMatches || [];
-
   const lastMatchId = matches[matches.length - 1]?.id ?? 0;
   const [selectedMatchId, setSelectedMatchId] = useState(lastMatchId);
 
@@ -80,127 +82,148 @@ export function CourtroomClient({ initialRawData, currentYear }: CourtroomClient
   };
 
   return (
-    <div className="min-h-screen bg-[#EBE8E1] pb-8 font-sans text-[#1C1C1C]">
-      <header className="sticky top-0 z-30 border-b-2 border-[#1C1C1C] bg-[#1C1C1C] py-2 text-[#EBE8E1] shadow-sm md:py-3">
-        <div className="container mx-auto flex items-center justify-between px-3 md:px-4">
-          <div className="flex items-center gap-3">
-            <div className="bg-amber-600 p-1.5">
-              <Gavel className="h-4 w-4 text-[#1C1C1C] md:h-5 md:w-5" />
+    <AnimatePresence mode="wait">
+      {showSecret ? (
+        <motion.div
+          key="secret"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ThingsToDo onBackAction={() => setShowSecret(false)} />
+        </motion.div>
+      ) : (
+        <motion.div
+          key="courtroom"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="min-h-screen bg-[#EBE8E1] pb-8 font-sans text-[#1C1C1C]"
+        >
+          <header className="sticky top-0 z-30 border-b-2 border-[#1C1C1C] bg-[#1C1C1C] py-2 text-[#EBE8E1] shadow-sm md:py-3">
+            <div className="container mx-auto flex items-center justify-between px-3 md:px-4">
+              <div className="flex items-center gap-3">
+                <div className="bg-amber-600 p-1.5">
+                  <Gavel className="h-4 w-4 text-[#1C1C1C] md:h-5 md:w-5" />
+                </div>
+                <div>
+                  <h1 className="font-serif text-lg font-bold tracking-wider uppercase md:text-xl">
+                    ZIP COURTROOM
+                  </h1>
+                  <div className="my-0.5 h-px w-full bg-amber-600"></div>
+                  <p className="hidden text-[9px] tracking-[0.2em] text-amber-500 uppercase md:block">
+                    Official Judicial Records
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/game"
+                  className="flex items-center gap-1.5 border border-amber-600 bg-amber-600 px-3 py-1.5 text-[10px] font-bold tracking-wider text-[#1C1C1C] uppercase transition-colors hover:bg-amber-500 md:text-xs"
+                >
+                  <Gamepad2 className="h-3 w-3" />
+                  <span className="hidden md:block">Play</span>
+                </Link>
+                <Link
+                  href="/stats"
+                  className="flex items-center gap-1.5 border border-amber-600 bg-transparent px-3 py-1.5 text-[10px] font-bold tracking-wider text-amber-500 uppercase transition-colors hover:bg-amber-600 hover:text-[#1C1C1C] md:text-xs"
+                >
+                  <BarChart3 className="h-3 w-3" />
+                  <span className="hidden md:block">Stats</span>
+                </Link>
+              </div>
             </div>
-            <div>
-              <h1 className="font-serif text-lg font-bold tracking-wider uppercase md:text-xl">
-                ZIP COURTROOM
-              </h1>
-              <div className="my-0.5 h-px w-full bg-amber-600"></div>
-              <p className="hidden text-[9px] tracking-[0.2em] text-amber-500 uppercase md:block">
-                Official Judicial Records
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/game"
-              className="flex items-center gap-1.5 border border-amber-600 bg-amber-600 px-3 py-1.5 text-[10px] font-bold tracking-wider text-[#1C1C1C] uppercase transition-colors hover:bg-amber-500 md:text-xs"
-            >
-              <Gamepad2 className="h-3 w-3" />
-              <span className="hidden md:block">Play</span>
-            </Link>
-            <Link
-              href="/stats"
-              className="flex items-center gap-1.5 border border-amber-600 bg-transparent px-3 py-1.5 text-[10px] font-bold tracking-wider text-amber-500 uppercase transition-colors hover:bg-amber-600 hover:text-[#1C1C1C] md:text-xs"
-            >
-              <BarChart3 className="h-3 w-3" />
-              <span className="hidden md:block">Stats</span>
-            </Link>
-          </div>
-        </div>
-      </header>
+          </header>
 
-      <main className="container mx-auto px-3 py-4 md:px-4 md:py-6">
-        <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-12 lg:gap-6">
-          <div className="order-1 h-fit lg:sticky lg:top-24 lg:col-span-8">
-            {isLoading ? (
-              <div className="flex h-48 items-center justify-center border border-dashed border-[#1C1C1C] bg-transparent">
-                <p className="animate-pulse font-serif text-sm text-[#1C1C1C]">
-                  Retrieving records...
-                </p>
+          <main className="container mx-auto px-3 py-4 md:px-4 md:py-6">
+            <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-12 lg:gap-6">
+              <div className="order-1 h-fit lg:sticky lg:top-24 lg:col-span-8">
+                {isLoading ? (
+                  <div className="flex h-48 items-center justify-center border border-dashed border-[#1C1C1C] bg-transparent">
+                    <p className="animate-pulse font-serif text-sm text-[#1C1C1C]">
+                      Retrieving records...
+                    </p>
+                  </div>
+                ) : selectedMatch ? (
+                  <div className="space-y-4">
+                    <div className="flex flex-col justify-between border-b border-[#1C1C1C] pb-1 md:flex-row md:items-end">
+                      <h2 className="font-serif text-sm font-bold text-[#1C1C1C] md:text-base">
+                        {getMatchTitle(selectedMatch)}
+                      </h2>
+                      <span className="font-mono text-[10px] font-bold text-slate-600 uppercase md:text-xs">
+                        {selectedMatch.date}
+                      </span>
+                    </div>
+                    <VerdictBanner match={selectedMatch} onGavelClick={() => setShowSecret(true)} />
+                    <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-3">
+                      <StatCard
+                        label="Winner Time"
+                        value={selectedMatch.winnerTime ? `${selectedMatch.winnerTime}s` : "N/A"}
+                        emoji="🎀"
+                      />
+                      <StatCard
+                        label="Loser Time"
+                        value={selectedMatch.loserTime ? `${selectedMatch.loserTime}s` : "DNF"}
+                      />
+                      <StatCard
+                        label="Time Diff"
+                        value={selectedMatch.diff >= 0 ? `+${selectedMatch.diff.toFixed(2)}s` : "-"}
+                      />
+                      <StatCard
+                        label="Win Streak"
+                        value={selectedMatch.streak.toString()}
+                        highlighted={selectedMatch.streak >= 2}
+                      />
+                    </div>
+                    <div className="mt-3 flex items-center gap-2">
+                      <button
+                        onClick={handleShare}
+                        className="flex cursor-pointer items-center gap-1.5 border border-amber-600 bg-black/80 px-3 py-1.5 text-[10px] font-bold tracking-wider text-amber-500 uppercase transition-colors hover:bg-amber-600 hover:text-[#1C1C1C]"
+                      >
+                        <Share2 className="h-3 w-3" />
+                        Share Verdict
+                      </button>
+                      <Link
+                        href={`/case/${selectedMatch.puzzleNo}`}
+                        className="flex cursor-pointer items-center gap-1.5 border border-amber-600 bg-black/80 px-3 py-1.5 text-[10px] font-bold tracking-wider text-amber-500 uppercase transition-colors hover:bg-amber-600 hover:text-[#1C1C1C]"
+                      >
+                        <BookOpen className="h-3 w-3" />
+                        Open Verdict
+                      </Link>
+                    </div>
+                    <div className="mt-4">
+                      <SeasonRecord matches={matches} />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex h-48 items-center justify-center border border-dashed border-[#1C1C1C] bg-transparent">
+                    <p className="font-serif text-sm text-[#1C1C1C]">
+                      No cases filed yet for {selectedYear}.
+                    </p>
+                  </div>
+                )}
               </div>
-            ) : selectedMatch ? (
-              <div className="space-y-4">
-                <div className="flex flex-col justify-between border-b border-[#1C1C1C] pb-1 md:flex-row md:items-end">
-                  <h2 className="font-serif text-sm font-bold text-[#1C1C1C] md:text-base">
-                    {getMatchTitle(selectedMatch)}
-                  </h2>
-                  <span className="font-mono text-[10px] font-bold text-slate-600 uppercase md:text-xs">
-                    {selectedMatch.date}
-                  </span>
+              <div className="order-2 lg:col-span-4">
+                <div className="mt-8 mb-4 flex justify-end md:mt-0">
+                  <YearSelector year={selectedYear} onChange={setSelectedYear} />
                 </div>
-                <VerdictBanner match={selectedMatch} />
-                <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-3">
-                  <StatCard
-                    label="Winner Time"
-                    value={selectedMatch.winnerTime ? `${selectedMatch.winnerTime}s` : "N/A"}
-                    emoji="🎀"
-                  />
-                  <StatCard
-                    label="Loser Time"
-                    value={selectedMatch.loserTime ? `${selectedMatch.loserTime}s` : "DNF"}
-                  />
-                  <StatCard
-                    label="Time Diff"
-                    value={selectedMatch.diff >= 0 ? `+${selectedMatch.diff.toFixed(2)}s` : "-"}
-                  />
-                  <StatCard
-                    label="Win Streak"
-                    value={selectedMatch.streak.toString()}
-                    highlighted={selectedMatch.streak >= 2}
-                  />
-                </div>
-                <div className="mt-3 flex items-center gap-2">
-                  <button
-                    onClick={handleShare}
-                    className="flex cursor-pointer items-center gap-1.5 border border-amber-600 bg-black/80 px-3 py-1.5 text-[10px] font-bold tracking-wider text-amber-500 uppercase transition-colors hover:bg-amber-600 hover:text-[#1C1C1C]"
-                  >
-                    <Share2 className="h-3 w-3" />
-                    Share Verdict
-                  </button>
-                  <Link
-                    href={`/case/${selectedMatch.puzzleNo}`}
-                    className="flex cursor-pointer items-center gap-1.5 border border-amber-600 bg-black/80 px-3 py-1.5 text-[10px] font-bold tracking-wider text-amber-500 uppercase transition-colors hover:bg-amber-600 hover:text-[#1C1C1C]"
-                  >
-                    <BookOpen className="h-3 w-3" />
-                    Open Verdict
-                  </Link>
-                </div>
-                <div className="mt-4">
-                  <SeasonRecord matches={matches} />
-                </div>
-              </div>
-            ) : (
-              <div className="flex h-48 items-center justify-center border border-dashed border-[#1C1C1C] bg-transparent">
-                <p className="font-serif text-sm text-[#1C1C1C]">
-                  No cases filed yet for {selectedYear}.
-                </p>
-              </div>
-            )}
-          </div>
-          <div className="order-2 lg:col-span-4">
-            <div className="mt-8 mb-4 flex justify-end md:mt-0">
-              <YearSelector year={selectedYear} onChange={setSelectedYear} />
-            </div>
 
-            <MatchList
-              matches={matches}
-              selectedMatchId={selectedMatchId}
-              onSelectMatch={(id) => {
-                setSelectedMatchId(id);
-                if (window.innerWidth < 1024) window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-            />
-          </div>
-        </div>
-      </main>
-    </div>
+                <MatchList
+                  matches={matches}
+                  selectedMatchId={selectedMatchId}
+                  onSelectMatch={(id) => {
+                    setSelectedMatchId(id);
+                    if (window.innerWidth < 1024) window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                />
+              </div>
+            </div>
+          </main>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 

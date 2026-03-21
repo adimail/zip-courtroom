@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { MatchResult } from "../../lib/courtroom";
 import { Gavel, Scale, Gift } from "lucide-react";
 import { motion } from "motion/react";
@@ -7,11 +8,22 @@ import { motion } from "motion/react";
 interface VerdictBannerProps {
   match: MatchResult;
   onShare?: () => void;
+  onGavelClick?: () => void;
 }
 
-export function VerdictBanner({ match }: VerdictBannerProps) {
+export function VerdictBanner({ match, onGavelClick }: VerdictBannerProps) {
+  const [clickCount, setClickCount] = useState(0);
   const primaryQuote = match.quotes[0];
   const subQuotes = match.quotes.slice(1);
+
+  const handleHammerClick = () => {
+    const nextCount = clickCount + 1;
+    setClickCount(nextCount);
+    if (nextCount === 11) {
+      onGavelClick?.();
+      setClickCount(0);
+    }
+  };
 
   return (
     <div className="relative w-full overflow-hidden border-2 border-[#1C1C1C] bg-[#1C1C1C] p-1 shadow-lg">
@@ -33,7 +45,12 @@ export function VerdictBanner({ match }: VerdictBannerProps) {
         <div className="mb-6 flex flex-col items-center justify-center gap-3">
           <div className="flex items-center gap-3">
             <div className="h-px w-12 bg-amber-600"></div>
-            <Gavel className="h-6 w-6 text-amber-500" />
+            <button
+              onClick={handleHammerClick}
+              className="cursor-pointer transition-transform active:scale-90"
+            >
+              <Gavel className="h-6 w-6 text-amber-500" />
+            </button>
             <div className="h-px w-12 bg-amber-600"></div>
           </div>
           <h2 className="font-serif text-xs font-bold tracking-[0.3em] text-amber-500 uppercase md:text-sm">
