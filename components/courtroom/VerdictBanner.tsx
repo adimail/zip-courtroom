@@ -4,15 +4,22 @@ import { useState } from "react";
 import { MatchResult } from "../../lib/courtroom";
 import { Gavel, Scale, Gift } from "lucide-react";
 import { motion } from "motion/react";
+import { FoldingVerdict } from "@/components/easteregg/FoldingVerdict";
 
 interface VerdictBannerProps {
   match: MatchResult;
   onShare?: () => void;
   onGavelClick?: () => void;
+  onOfficialVerdictLongPress?: () => void;
 }
 
-export function VerdictBanner({ match, onGavelClick }: VerdictBannerProps) {
+export function VerdictBanner({
+  match,
+  onGavelClick,
+  onOfficialVerdictLongPress,
+}: VerdictBannerProps) {
   const [clickCount, setClickCount] = useState(0);
+
   const primaryQuote = match.quotes[0];
   const subQuotes = match.quotes.slice(1);
 
@@ -31,29 +38,23 @@ export function VerdictBanner({ match, onGavelClick }: VerdictBannerProps) {
         <Scale className="h-64 w-64 text-[#EBE8E1]" />
       </div>
 
-      <div className="relative z-10 flex flex-col border-2 border-double border-[#EBE8E1]/30 p-6 text-[#EBE8E1] md:p-10">
-        <div className="absolute top-4 right-4 rotate-12 opacity-80 md:top-6 md:right-6">
-          <div className="mask-image-grunge flex h-20 w-20 items-center justify-center rounded-full border-2 border-amber-700 p-1 text-amber-700 md:h-24 md:w-24">
-            <div className="flex h-full w-full items-center justify-center rounded-full border border-amber-700 text-center text-[10px] leading-none font-black tracking-widest uppercase">
-              Official
-              <br />
-              Verdict
-            </div>
-          </div>
+      <div className="relative z-10 flex flex-col border-2 border-double border-[#EBE8E1]/30 p-4 text-[#EBE8E1] md:p-10">
+        <div className="absolute top-1 right-1 z-20 rotate-12 touch-none opacity-90 select-none md:top-4 md:right-4">
+          <FoldingVerdict onFoldComplete={() => onOfficialVerdictLongPress?.()} />
         </div>
 
-        <div className="mb-6 flex flex-col items-center justify-center gap-3">
+        <div className="mb-4 flex flex-col items-center justify-center gap-2 pr-16 md:mb-6 md:gap-3 md:pr-0">
           <div className="flex items-center gap-3">
-            <div className="h-px w-12 bg-amber-600"></div>
+            <div className="h-px w-8 bg-amber-600 md:w-12"></div>
             <button
               onClick={handleHammerClick}
               className="cursor-pointer transition-transform active:scale-90"
             >
-              <Gavel className="h-6 w-6 text-amber-500" />
+              <Gavel className="h-5 w-5 text-amber-500 md:h-6 md:w-6" />
             </button>
-            <div className="h-px w-12 bg-amber-600"></div>
+            <div className="h-px w-8 bg-amber-600 md:w-12"></div>
           </div>
-          <h2 className="font-serif text-xs font-bold tracking-[0.3em] text-amber-500 uppercase md:text-sm">
+          <h2 className="font-serif text-[10px] font-bold tracking-[0.2em] text-amber-500 uppercase md:text-sm md:tracking-[0.3em]">
             Judicial Finding • Case #{match.puzzleNo}
           </h2>
         </div>
@@ -65,7 +66,7 @@ export function VerdictBanner({ match, onGavelClick }: VerdictBannerProps) {
             animate={{ opacity: 1, scale: 1 }}
             className="relative"
           >
-            <h1 className="font-serif text-2xl leading-snug font-bold text-[#EBE8E1] md:text-4xl">
+            <h1 className="font-serif text-xl leading-snug font-bold text-[#EBE8E1] md:text-4xl">
               {primaryQuote}
             </h1>
           </motion.div>
@@ -78,7 +79,7 @@ export function VerdictBanner({ match, onGavelClick }: VerdictBannerProps) {
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + idx * 0.1 }}
-                  className="font-mono text-sm text-gray-400 italic md:text-base"
+                  className="font-mono text-xs text-gray-400 italic md:text-base"
                 >
                   &quot;{quote}&quot;
                 </motion.p>

@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useMatches } from "@/hooks/useMatches";
 import { YearSelector } from "@/components/ui/YearSelector";
 import { ThingsToDo } from "@/components/easteregg/ThingsToDo";
+import { PraniSangrahaly } from "@/components/easteregg/PraniSangrahaly";
 import { motion, AnimatePresence } from "motion/react";
 
 interface CourtroomClientProps {
@@ -17,9 +18,12 @@ interface CourtroomClientProps {
   currentYear: number;
 }
 
+type ViewState = "court" | "docket" | "prani";
+
 export function CourtroomClient({ initialRawData, currentYear }: CourtroomClientProps) {
   const [selectedYear, setSelectedYear] = useState(currentYear);
-  const [showSecret, setShowSecret] = useState(false);
+  const [activeView, setActiveView] = useState<ViewState>("court");
+
   const { data, isLoading } = useMatches(
     selectedYear,
     selectedYear === currentYear ? initialRawData : undefined
@@ -35,6 +39,9 @@ export function CourtroomClient({ initialRawData, currentYear }: CourtroomClient
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore arrow keys if an easter egg is open
+      if (activeView !== "court") return;
+
       if (e.key === "ArrowUp") {
         e.preventDefault();
         setSelectedMatchId((prev) => {
@@ -51,7 +58,7 @@ export function CourtroomClient({ initialRawData, currentYear }: CourtroomClient
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [matches.length]);
+  }, [matches.length, activeView]);
 
   const selectedMatch = matches.find((m) => m.id === selectedMatchId) || matches[0];
 
@@ -82,20 +89,30 @@ export function CourtroomClient({ initialRawData, currentYear }: CourtroomClient
   };
 
   return (
-    <AnimatePresence mode="wait">
-      {showSecret ? (
+    <AnimatePresence mode="wait" initial={false}>
+      {activeView === "docket" ? (
         <motion.div
-          key="secret"
+          key="docket"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.2 }}
         >
-          <ThingsToDo onBackAction={() => setShowSecret(false)} />
+          <ThingsToDo onBackAction={() => setActiveView("court")} />
+        </motion.div>
+      ) : activeView === "prani" ? (
+        <motion.div
+          key="prani"
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.98 }}
+          transition={{ duration: 0.2 }}
+        >
+          <PraniSangrahaly onBackAction={() => setActiveView("court")} />
         </motion.div>
       ) : (
         <motion.div
-          key="courtroom"
+          key="court"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -156,7 +173,11 @@ export function CourtroomClient({ initialRawData, currentYear }: CourtroomClient
                         {selectedMatch.date}
                       </span>
                     </div>
-                    <VerdictBanner match={selectedMatch} onGavelClick={() => setShowSecret(true)} />
+                    <VerdictBanner
+                      match={selectedMatch}
+                      onGavelClick={() => setActiveView("docket")}
+                      onOfficialVerdictLongPress={() => setActiveView("prani")}
+                    />
                     <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-3">
                       <StatCard
                         label="Winner Time"
