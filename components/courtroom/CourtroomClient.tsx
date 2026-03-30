@@ -89,7 +89,7 @@ export function CourtroomClient({ initialRawData, currentYear }: CourtroomClient
   };
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait" initial={false}>
       {activeView === "docket" ? (
         <motion.div
           key="docket"

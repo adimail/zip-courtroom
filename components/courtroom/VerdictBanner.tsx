@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { MatchResult } from "../../lib/courtroom";
 import { Gavel, Scale, Gift } from "lucide-react";
 import { motion } from "motion/react";
+import { FoldingVerdict } from "@/components/easteregg/FoldingVerdict";
 
 interface VerdictBannerProps {
   match: MatchResult;
@@ -18,7 +19,6 @@ export function VerdictBanner({
   onOfficialVerdictLongPress,
 }: VerdictBannerProps) {
   const [clickCount, setClickCount] = useState(0);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const primaryQuote = match.quotes[0];
   const subQuotes = match.quotes.slice(1);
@@ -32,55 +32,29 @@ export function VerdictBanner({
     }
   };
 
-  const handlePointerDown = () => {
-    timerRef.current = setTimeout(() => {
-      onOfficialVerdictLongPress?.();
-    }, 1200); // 1.2s long press duration
-  };
-
-  const clearTimer = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-  };
-
   return (
     <div className="relative w-full overflow-hidden border-2 border-[#1C1C1C] bg-[#1C1C1C] p-1 shadow-lg">
       <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-5">
         <Scale className="h-64 w-64 text-[#EBE8E1]" />
       </div>
 
-      <div className="relative z-10 flex flex-col border-2 border-double border-[#EBE8E1]/30 p-6 text-[#EBE8E1] md:p-10">
-        {/* Official Verdict Badge with Long Press Event */}
-        <div
-          className="absolute top-4 right-4 rotate-12 cursor-pointer touch-none opacity-80 transition-transform select-none active:scale-95 md:top-6 md:right-6"
-          onPointerDown={handlePointerDown}
-          onPointerUp={clearTimer}
-          onPointerLeave={clearTimer}
-          onPointerCancel={clearTimer}
-        >
-          <div className="mask-image-grunge flex h-20 w-20 items-center justify-center rounded-full border-2 border-amber-700 p-1 text-amber-700 md:h-24 md:w-24">
-            <div className="flex h-full w-full items-center justify-center rounded-full border border-amber-700 text-center text-[10px] leading-none font-black tracking-widest uppercase">
-              Official
-              <br />
-              Verdict
-            </div>
-          </div>
+      <div className="relative z-10 flex flex-col border-2 border-double border-[#EBE8E1]/30 p-4 text-[#EBE8E1] md:p-10">
+        <div className="absolute top-1 right-1 z-20 rotate-12 touch-none opacity-90 select-none md:top-4 md:right-4">
+          <FoldingVerdict onFoldComplete={() => onOfficialVerdictLongPress?.()} />
         </div>
 
-        <div className="mb-6 flex flex-col items-center justify-center gap-3">
+        <div className="mb-4 flex flex-col items-center justify-center gap-2 pr-16 md:mb-6 md:gap-3 md:pr-0">
           <div className="flex items-center gap-3">
-            <div className="h-px w-12 bg-amber-600"></div>
+            <div className="h-px w-8 bg-amber-600 md:w-12"></div>
             <button
               onClick={handleHammerClick}
               className="cursor-pointer transition-transform active:scale-90"
             >
-              <Gavel className="h-6 w-6 text-amber-500" />
+              <Gavel className="h-5 w-5 text-amber-500 md:h-6 md:w-6" />
             </button>
-            <div className="h-px w-12 bg-amber-600"></div>
+            <div className="h-px w-8 bg-amber-600 md:w-12"></div>
           </div>
-          <h2 className="font-serif text-xs font-bold tracking-[0.3em] text-amber-500 uppercase md:text-sm">
+          <h2 className="font-serif text-[10px] font-bold tracking-[0.2em] text-amber-500 uppercase md:text-sm md:tracking-[0.3em]">
             Judicial Finding • Case #{match.puzzleNo}
           </h2>
         </div>
@@ -92,7 +66,7 @@ export function VerdictBanner({
             animate={{ opacity: 1, scale: 1 }}
             className="relative"
           >
-            <h1 className="font-serif text-2xl leading-snug font-bold text-[#EBE8E1] md:text-4xl">
+            <h1 className="font-serif text-xl leading-snug font-bold text-[#EBE8E1] md:text-4xl">
               {primaryQuote}
             </h1>
           </motion.div>
@@ -105,7 +79,7 @@ export function VerdictBanner({
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + idx * 0.1 }}
-                  className="font-mono text-sm text-gray-400 italic md:text-base"
+                  className="font-mono text-xs text-gray-400 italic md:text-base"
                 >
                   &quot;{quote}&quot;
                 </motion.p>
