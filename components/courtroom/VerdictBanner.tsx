@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { MatchResult } from "../../lib/courtroom";
 import { Gavel, Scale, Gift } from "lucide-react";
 import { motion } from "motion/react";
@@ -9,10 +9,17 @@ interface VerdictBannerProps {
   match: MatchResult;
   onShare?: () => void;
   onGavelClick?: () => void;
+  onOfficialVerdictLongPress?: () => void;
 }
 
-export function VerdictBanner({ match, onGavelClick }: VerdictBannerProps) {
+export function VerdictBanner({
+  match,
+  onGavelClick,
+  onOfficialVerdictLongPress,
+}: VerdictBannerProps) {
   const [clickCount, setClickCount] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
   const primaryQuote = match.quotes[0];
   const subQuotes = match.quotes.slice(1);
 
@@ -25,6 +32,19 @@ export function VerdictBanner({ match, onGavelClick }: VerdictBannerProps) {
     }
   };
 
+  const handlePointerDown = () => {
+    timerRef.current = setTimeout(() => {
+      onOfficialVerdictLongPress?.();
+    }, 1200); // 1.2s long press duration
+  };
+
+  const clearTimer = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
   return (
     <div className="relative w-full overflow-hidden border-2 border-[#1C1C1C] bg-[#1C1C1C] p-1 shadow-lg">
       <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-5">
@@ -32,7 +52,14 @@ export function VerdictBanner({ match, onGavelClick }: VerdictBannerProps) {
       </div>
 
       <div className="relative z-10 flex flex-col border-2 border-double border-[#EBE8E1]/30 p-6 text-[#EBE8E1] md:p-10">
-        <div className="absolute top-4 right-4 rotate-12 opacity-80 md:top-6 md:right-6">
+        {/* Official Verdict Badge with Long Press Event */}
+        <div
+          className="absolute top-4 right-4 rotate-12 cursor-pointer touch-none opacity-80 transition-transform select-none active:scale-95 md:top-6 md:right-6"
+          onPointerDown={handlePointerDown}
+          onPointerUp={clearTimer}
+          onPointerLeave={clearTimer}
+          onPointerCancel={clearTimer}
+        >
           <div className="mask-image-grunge flex h-20 w-20 items-center justify-center rounded-full border-2 border-amber-700 p-1 text-amber-700 md:h-24 md:w-24">
             <div className="flex h-full w-full items-center justify-center rounded-full border border-amber-700 text-center text-[10px] leading-none font-black tracking-widest uppercase">
               Official
