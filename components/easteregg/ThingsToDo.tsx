@@ -9,6 +9,7 @@ import {
   MessageSquare,
   ExternalLink,
   Loader2,
+  RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
@@ -28,7 +29,7 @@ function parseDate(dateStr?: string | null) {
 
 export function ThingsToDo({ onBackAction }: { onBackAction: () => void }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const { data: activities, isLoading, isError } = useActivities();
+  const { data: activities, isLoading, isError, refetch, isFetching } = useActivities();
 
   const sortedActivities = useMemo(() => {
     if (!activities) return [];
@@ -45,12 +46,23 @@ export function ThingsToDo({ onBackAction }: { onBackAction: () => void }) {
   return (
     <div className="min-h-screen bg-[#161616] p-3 font-sans text-[#EBE8E1] md:p-8">
       <div className="mx-auto max-w-4xl">
-        <button
-          onClick={onBackAction}
-          className="mb-4 flex items-center gap-2 text-[10px] font-bold tracking-widest text-gray-500 uppercase transition-colors hover:text-amber-500 md:mb-6 md:text-xs"
-        >
-          <ArrowLeft className="h-3 w-3 md:h-4 md:w-4" /> Back to Court
-        </button>
+        <div className="mb-4 flex items-center justify-between md:mb-6">
+          <button
+            onClick={onBackAction}
+            className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-gray-500 uppercase transition-colors hover:text-amber-500 md:text-xs"
+          >
+            <ArrowLeft className="h-3 w-3 md:h-4 md:w-4" /> Back to Court
+          </button>
+
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="flex items-center gap-2 rounded-full border border-gray-800 bg-[#1C1C1C] px-3 py-1.5 text-[10px] font-bold tracking-widest text-gray-500 uppercase transition-all hover:border-amber-500 hover:text-amber-500 disabled:opacity-50"
+          >
+            <RefreshCw className={cn("h-3 w-3", isFetching && "animate-spin")} />
+            {isFetching ? "Syncing..." : "Refresh"}
+          </button>
+        </div>
 
         <div className="mb-6 flex items-end justify-between border-b border-gray-800 pb-4 md:mb-8 md:pb-6">
           <div>
@@ -78,7 +90,7 @@ export function ThingsToDo({ onBackAction }: { onBackAction: () => void }) {
         <div className="relative ml-1 pl-6 md:ml-4 md:pl-10">
           <div className="absolute top-4 bottom-0 left-0 w-px bg-gray-800" />
 
-          {isLoading ? (
+          {isLoading || isFetching ? (
             <div className="flex flex-col items-center justify-center py-20 text-gray-500">
               <Loader2 className="mb-4 h-6 w-6 animate-spin md:h-8 md:w-8" />
               <p className="text-[10px] font-bold tracking-widest uppercase md:text-xs">

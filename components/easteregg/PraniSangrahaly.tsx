@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { ArrowLeft, X, Loader2, Image as ImageIcon, RefreshCw } from "lucide-react";
+import {
+  ArrowLeft,
+  X,
+  Loader2,
+  Image as ImageIcon,
+  RefreshCw,
+  ExternalLink,
+  Plus,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import { useZoozoo, ZoozooItem } from "@/hooks/useZoozoo";
@@ -355,7 +363,7 @@ export function PraniSangrahaly({ onBackAction }: { onBackAction: () => void }) 
           </div>
         </div>
 
-        {isLoading ? (
+        {isLoading || isFetching ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-500">
             <Loader2 className="mb-4 h-8 w-8 animate-spin" />
             <p className="text-[10px] font-bold tracking-widest uppercase md:text-xs">
@@ -370,6 +378,27 @@ export function PraniSangrahaly({ onBackAction }: { onBackAction: () => void }) 
           </div>
         ) : (
           <>
+            <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+              {[
+                { label: "Total pieces", val: data.length },
+                { label: "Total folding time", val: totalTime },
+                { label: "Avg difficulty", val: avgDifficulty },
+                { label: "Since", val: startDate },
+              ].map(({ label, val }) => (
+                <div
+                  key={label}
+                  className="rounded-lg border border-gray-800 bg-[#1C1C1C] p-3 md:p-4"
+                >
+                  <div className="mb-1 text-[8px] font-bold tracking-widest text-gray-500 uppercase md:mb-2 md:text-[9px]">
+                    {label}
+                  </div>
+                  <div className="font-mono text-base font-bold text-amber-500 md:text-xl">
+                    {val}
+                  </div>
+                </div>
+              ))}
+            </div>
+
             <div className="mb-6 flex flex-col justify-between gap-4 rounded-lg border border-gray-800 bg-[#1C1C1C] p-3 md:flex-row md:items-center md:p-4">
               <div className="flex flex-wrap gap-2">
                 {types.map((t) => (
@@ -426,6 +455,43 @@ export function PraniSangrahaly({ onBackAction }: { onBackAction: () => void }) 
                 </AnimatePresence>
               </div>
             )}
+
+            <footer className="mt-12 border-t border-gray-800 pt-8 pb-12 text-center">
+              <div className="mb-8 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-12">
+                <div className="flex flex-col items-center text-center sm:text-left">
+                  <div className="mb-1 text-[8px] font-bold tracking-[0.2em] text-gray-500 uppercase">
+                    Total Investment
+                  </div>
+                  <div className="font-mono text-2xl font-bold text-amber-500">{totalTime}</div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="text-[8px] font-bold tracking-[0.3em] text-gray-600 uppercase">
+                  Sources
+                </div>
+                <div className="flex flex-wrap justify-center gap-3">
+                  <a
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSfFnegq62WEOXg7pocTvGDLPZF8Yj_Ifk-R5Ik0PBbNEeK4Cw/viewform?usp=header"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-2 rounded-md border border-amber-600 bg-amber-600/10 px-4 py-2 text-[10px] font-bold tracking-widest text-amber-500 uppercase transition-all hover:bg-amber-600 hover:text-[#161616]"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Add Piece
+                  </a>
+                  <a
+                    href="https://docs.google.com/spreadsheets/d/1YQ2xoLyN4pXqhuicquJZGWbV6x7wy8vqeCQ5FT05g_0/edit?gid=2109128590#gid=2109128590"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-2 rounded-md border border-gray-800 bg-[#1C1C1C] px-4 py-2 text-[10px] font-bold tracking-widest text-gray-400 uppercase transition-all hover:border-amber-500 hover:text-amber-500"
+                  >
+                    View Source
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                </div>
+              </div>
+            </footer>
           </>
         )}
       </div>
